@@ -3,6 +3,7 @@ package controllers
 import (
 	m "backend-cinemax/models"
 	u "backend-cinemax/utils"
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -76,5 +77,56 @@ func RegisterHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, u.Response{
 		Success: true,
 		Message: "Register Success",
+	})
+}
+
+
+func LoginHandler(ctx *gin.Context) {
+	var req m.LoginRequest
+
+	err := ctx.ShouldBind(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "Bad Request",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	if req.Email == "" {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "Email is required",
+		})
+		return
+	}
+
+	if req.Password == "" {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "Password is required",
+		})
+		return
+	}
+
+
+	if !m.MatchUserInDatabase(req.Email, req.Password) {
+		ctx.JSON(http.StatusUnauthorized, u.Response{
+			Success: false,
+			Message: "Unauthorized. Make sure your email and password is correct",
+		})
+		return
+	}
+
+	token, err := u.GenerateToken(req.ID, req.Email)
+	if err != nil {
+		fmt.Println("LoginHandler error generate token:", err)
+	}
+
+	ctx.JSON(http.StatusOK, u.Response{
+		Success: true,
+		Message: "Login Success",
+		Token:   token,
 	})
 }
