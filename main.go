@@ -9,6 +9,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title           fgo24-be-tickitz
+// @version         1.0
+// @description     This is a backend service for tickitz web app
+// @Basepath /
 func main() {
 	r := gin.Default()
 	

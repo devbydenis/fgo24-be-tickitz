@@ -10,6 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
+// @summary Handle register user
+// @Description Create a new user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body m.RegisterRequest true "request create user"
+// @Success 201 {object} m.RegisterRequest
+// @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
+// @Router /auth/register [post]
 func RegisterHandler(ctx *gin.Context) {
 	var req m.RegisterRequest
 
@@ -80,7 +89,16 @@ func RegisterHandler(ctx *gin.Context) {
 	})
 }
 
-
+// @summary Handle login user
+// @Description Login user
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body m.LoginRequest true "request login user"
+// @Success 200 {object} u.Response{Success bool, Message string, Errors any}
+// @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
+// @Failure 401 {object} u.Response{Success bool, Message string, Errors any}
+// @Router /auth/login [post]
 func LoginHandler(ctx *gin.Context) {
 	var req m.LoginRequest
 
