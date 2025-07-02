@@ -206,7 +206,15 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 	redisClient.Set(context.Background(), "users", string(encoded), time.Duration(5)*time.Minute)
 	
 	//kirim otp via email
-	u.SendEmailOTP(req.Email, OTP)
+	// err = u.SendEmailOTP(req.Email, OTP)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusInternalServerError, u.Response{
+	// 		Success: false,
+	// 		Message: "Internal Server Error",
+	// 		Errors:  err.Error(),
+	// 	})
+	// 	return
+	// }
 
 	ctx.JSON(http.StatusOK, u.Response{
 		Success: true,
@@ -256,44 +264,63 @@ func ChangePasswordHandler(ctx *gin.Context) {
 	ctx.ShouldBind(&req)
 	
 	if req.NewPassword == ""{
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "New password are required",
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "New password are required",
 		})
 		return
 	}
 	
 	if req.ConfirmNewPassword == ""{
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Confirm password are required",
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "Confirm new password are required",
 		})
 		return
 	}
 	
 	if len(req.NewPassword) < 8 {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Password must be at least 8 characters",
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "Password must be at least 8 characters",
 		})
 		return
 	}
 	
 	if req.NewPassword != req.ConfirmNewPassword {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Password does not match!",
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "New password and confirm new password do not match",
 		})
 		return
 	}
 	
 	if !m.IsEmailExist(req.Email) {
-		ctx.JSON(http.StatusNotFound, gin.H {
-			"error": "Email not found",
+		ctx.JSON(http.StatusNotFound, u.Response{
+			Success: false,
+			Message: "Email not found",
 		})
 		return
 	}
 	
 	fmt.Println("req email controller", req.Email, req.NewPassword)
 	
-	m.UpdateUserPassword(req.Email, req.NewPassword)
+	err := m.UpdateUserPassword(req.Email, req.NewPassword)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, u.Response{
+			Success: false,
+			Message: "Internal Server Error",
+			Errors:  err.Error(),
+		})
+		return
+	}
 	
+	ctx.JSON(http.StatusOK, u.Response{
+		Success: true,
+		Message: "Password reset successfully",
+	})
+	
+
 	// ctx.JSON(http.StatusOK, gin.H{
 	// 	"message": "Password reset successfully",
 	// 	"user": u.FindUserByEmail(req.Email),

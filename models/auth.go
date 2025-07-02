@@ -137,7 +137,7 @@ func MatchUserInDatabase(email string, password string) bool {
 }
 
 func UpdateUserPassword(email string, newPassword string) error {
-		conn, err := c.DBConnect()
+	conn, err := c.DBConnect()
 	if err != nil {
 		return err
 	}
@@ -146,8 +146,9 @@ func UpdateUserPassword(email string, newPassword string) error {
 	}()
 
 	_, err = conn.Exec(context.Background(), `
-		INSERT INTO users (id, email, password) VALUES ($1, $2, $3);
-	`, email,
-)
-return err
+		UPDATE users SET password = $1 WHERE email = $2;
+	`, newPassword, email,
+	)
+
+	return err
 }

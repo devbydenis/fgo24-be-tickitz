@@ -1,0 +1,3 @@
+ALTER TABLE users DROP COLUMN username;
+
+ALTER TABLE profiles ADD COLUMN username VARCHAR(255);

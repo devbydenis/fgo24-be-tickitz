@@ -2,15 +2,17 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"math/rand/v2"
 	"net/smtp"
+	"os"
+
 	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	// "gopkg.in/gomail.v2"
 )
 
 func GenerateToken(id uuid.UUID, email string) (string, error) {
@@ -44,33 +46,50 @@ func GenerateOTP() string {
 	return strconv.Itoa(result)
 }
 
-func SendEmailOTP(emailRecipient string, body string) {
-	// redisClient := config.RedisConnect()
-	// decoded, err := redisClient.Get(context.Background(), "users").Result()
-	
-	// otp := models.OTPRequest{}
-	// err = json.Unmarshal([]byte(decoded), &otp)
+func SendEmailOTP(emailRecipient, otp string) error {
+	godotenv.Load()
+
+	// const CONFIG_SMTP_PORT = 587
+	// const CONFIG_SENDER_NAME = "wachingcinemax@gmail.com"
+
+	// mailer := gomail.NewMessage()
+  //   mailer.SetHeader("From", CONFIG_SENDER_NAME)
+  //   mailer.SetHeader("To", emailRecipient, "rahmadidenis@gmail.com")
+  //   mailer.SetHeader("Subject", "OTP Verification!")
+  //   mailer.SetBody("text/html", otp)
+
+	// dialer := gomail.NewDialer(
+	// 		os.Getenv("CONFIG_SMTP_HOST"),
+	// 		CONFIG_SMTP_PORT,
+	// 		os.Getenv("CONFIG_AUTH_EMAIL"),
+	// 		os.Getenv("CONFIG_AUTH_PASSWORD"),
+	// )
+
+	// err := dialer.DialAndSend(mailer)
 	// if err != nil {
-		
+	// 		return err
 	// }
 
-	from := "wachingcinemax@gmail.com"
-	pass := "cinemax123."
-	to := emailRecipient
+	// return nil
 
-	msg := "From: " + from + "\n" +
-		"To: " + to + "\n" +
-		"Subject: Hello there\n\n" +
-		"This is your OTP: " + body
+	// SMTP
+		smtpHost := os.Getenv("CONFIG_SMTP_HOST")
+    smtpPort := os.Getenv("CONFIG_SMTP_PORT")
+    senderEmail := os.Getenv("CONFIG_AUTH_EMAIL")      
+    senderPassword := os.Getenv("CONFIG_AUTH_PASSWORD")    
 
-	err := smtp.SendMail("smtp.gmail.com:587",
-		smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
-		from, []string{to}, []byte(msg))
+    auth := smtp.PlainAuth("", senderEmail, senderPassword, smtpHost)
 
-	if err != nil {
-		log.Printf("smtp error: %s", err)
-		return
-	}
-	
-	log.Print("sent, visit " + emailRecipient)
+    subject := "Subject: Your OTP Code\r\n"
+    body := fmt.Sprintf("Your OTP code is: %s", otp)
+    msg := []byte(subject + "\r\n" + body)
+
+    err := smtp.SendMail(
+        smtpHost+":"+smtpPort,
+        auth,
+        senderEmail,
+				[]string{emailRecipient},
+        msg,
+    )
+    return err
 }

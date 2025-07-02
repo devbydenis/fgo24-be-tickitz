@@ -11,7 +11,7 @@ MIGRATE=migrate -source "file://$(MIGRATION_DIR)" \
 		-database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)"
 
 migration_create:
-	migrate create -seq -dir -source file://./migrations -ext sql $(name)
+	migrate create -seq -dir $(MIGRATION_DIR) -ext sql $(name)
 
 migration_up: 
 		$(MIGRATE) up
