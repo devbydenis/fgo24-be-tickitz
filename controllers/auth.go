@@ -223,6 +223,15 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 	})
 }
 
+// @summary Handle verify otp
+// @Description Verify otp
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body m.VerifyOTP true "request verify otp"
+// @Success 200 {object} u.Response{Success bool, Message string, Errors any}
+// @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
+// @Router /auth/verify-otp [post]
 func VerifyOTPHandler(ctx *gin.Context) {
 	var req m.VerifyOTP
 	ctx.ShouldBind(&req)
@@ -258,6 +267,16 @@ func VerifyOTPHandler(ctx *gin.Context) {
 	})
 }
 
+// @summary Handle change password
+// @Description Change password
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param user body m.ChangePasswordRequest true "request change password"
+// @Success 200 {object} u.Response{Success bool, Message string, Errors any}
+// @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
+// @Failure 404 {object} u.Response{Success bool, Message string, Errors any}
+// @Router /auth/change-password [post]
 func ChangePasswordHandler(ctx *gin.Context) {
 	var req m.ChangePasswordRequest
 	fmt.Println("req:", req)
