@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"math/rand/v2"
+	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -26,4 +28,16 @@ func GenerateToken(id uuid.UUID, email string) (string, error) {
 	}
 
 	return tokenString, nil
+}
+
+func GenerateOTP() string {
+	result := 0
+	for {
+		randomNumber := rand.IntN(9999)
+		if len(strconv.Itoa(randomNumber)) == 4 {
+			result = randomNumber
+			break
+		}
+	}
+	return strconv.Itoa(result)
 }
