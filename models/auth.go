@@ -41,6 +41,10 @@ type OTPRequest struct {
 	OTP string `json:"otp" form:"otp"`
 }
 
+type VerifyOTP struct {
+	OTP string `json:"otp" form:"otp"`
+}
+
 func IsEmailExist(email string) bool {
 	// conncect to db
 	conn, err := config.DBConnect()

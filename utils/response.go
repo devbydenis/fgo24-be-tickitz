@@ -5,4 +5,5 @@ type Response struct {
 	Message string `json:"message"`
 	Errors string `json:"errors,omitempty"`
 	Token string `json:"token,omitempty"`
+	OTP string `json:"otp,omitempty"`
 }

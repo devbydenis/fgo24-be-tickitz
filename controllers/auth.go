@@ -168,23 +168,26 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 	
 	err := ctx.ShouldBind(&req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
-			"message": "Internal server error",
+		ctx.JSON(http.StatusInternalServerError, u.Response{
+			Success: false,
+			Message: "Internal Server Error",
+			Errors:  err.Error(),
 		})
 		return
 	}
 	
 	if req.Email == "" {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": "Email is required",
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "Email is required",
 		})
 		return
 	}
 	
 	if !m.IsEmailExist(req.Email) {
-		ctx.JSON(http.StatusNotFound, gin.H {
-			"error": "Email not found",
+		ctx.JSON(http.StatusNotFound, u.Response{
+			Success: false,
+			Message: "Email not found",
 		})
 		return
 	}
@@ -201,10 +204,49 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 			}
 
 	redisClient.Set(context.Background(), "users", string(encoded), time.Duration(5)*time.Minute)
+	
+	//kirim otp via email
+	u.SendEmailOTP(req.Email, OTP)
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Verification code sent successfully",
-		"verification_code": OTP,
+	ctx.JSON(http.StatusOK, u.Response{
+		Success: true,
+		Message: "OTP sent successfully. Please check your email",
+		OTP:     OTP,
+	})
+}
+
+func VerifyOTPHandler(ctx *gin.Context) {
+	var req m.VerifyOTP
+	ctx.ShouldBind(&req)
+	
+	if req.OTP == "" {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "OTP is required",
+		})
+		return
+	}
+		
+	redisClient := config.RedisConnect()
+	decoded, err := redisClient.Get(context.Background(), "users").Result()
+	if err != nil {
+		fmt.Println("failed to get value from redis:", err)
+	}
+
+	otp := m.OTPRequest{}
+	err = json.Unmarshal([]byte(decoded), &otp)
+	
+	if req.OTP != otp.OTP {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "Invalid OTP",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusAccepted, u.Response{
+		Success: true,
+		Message: "OTP verified successfully",
 	})
 }
 

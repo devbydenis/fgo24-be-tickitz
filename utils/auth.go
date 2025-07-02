@@ -2,7 +2,9 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"math/rand/v2"
+	"net/smtp"
 	"strconv"
 	"time"
 
@@ -40,4 +42,35 @@ func GenerateOTP() string {
 		}
 	}
 	return strconv.Itoa(result)
+}
+
+func SendEmailOTP(emailRecipient string, body string) {
+	// redisClient := config.RedisConnect()
+	// decoded, err := redisClient.Get(context.Background(), "users").Result()
+	
+	// otp := models.OTPRequest{}
+	// err = json.Unmarshal([]byte(decoded), &otp)
+	// if err != nil {
+		
+	// }
+
+	from := "wachingcinemax@gmail.com"
+	pass := "cinemax123."
+	to := emailRecipient
+
+	msg := "From: " + from + "\n" +
+		"To: " + to + "\n" +
+		"Subject: Hello there\n\n" +
+		"This is your OTP: " + body
+
+	err := smtp.SendMail("smtp.gmail.com:587",
+		smtp.PlainAuth("", from, pass, "smtp.gmail.com"),
+		from, []string{to}, []byte(msg))
+
+	if err != nil {
+		log.Printf("smtp error: %s", err)
+		return
+	}
+	
+	log.Print("sent, visit " + emailRecipient)
 }

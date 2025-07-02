@@ -1,5 +1,10 @@
 basePath: /
 definitions:
+  models.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    type: object
   models.LoginRequest:
     properties:
       email:
@@ -35,6 +40,36 @@ info:
   title: fgo24-be-tickitz
   version: "1.0"
 paths:
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Forgot password
+      parameters:
+      - description: request forgot password
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/models.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Handle forgot password
+      tags:
+      - auth
   /auth/login:
     post:
       consumes:
