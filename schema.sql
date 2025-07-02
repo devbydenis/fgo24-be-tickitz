@@ -1,3 +1,6 @@
+-- Active: 1751390128722@@127.0.0.1@5454@cinemax
+CREATE  DATABASE cinemax;
+
 CREATE TYPE user_role AS ENUM ('user', 'admin');
 
 CREATE TABLE users(
@@ -19,6 +22,7 @@ CREATE TABLE sessions(
   created_at  TIMESTAMP DEFAULT now(),
   expired_at  TIMESTAMP DEFAULT now()
 );
+
 CREATE TABLE profiles(
   id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id     UUID NOT NULL UNIQUE REFERENCES users(id),
