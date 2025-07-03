@@ -13,6 +13,13 @@ import (
 // @version         1.0
 // @description     This is a backend service for tickitz web app
 // @Basepath /
+
+// @SecurityDefinitions.ApiKey  Token
+// @in header
+// @name Authorization
+// @description Use Bearer token to access protected routes
+// @description Example: Bearer your_token_here
+// @description Make sure to include the word "Bearer" followed by a space before the token
 func main() {
 	r := gin.Default()
 	

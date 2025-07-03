@@ -1,11 +1,20 @@
 basePath: /
 definitions:
-  models.ForgotPasswordRequest:
+  dto.ChangePasswordRequest:
+    properties:
+      confirm_new_password:
+        type: string
+      email:
+        type: string
+      new_password:
+        type: string
+    type: object
+  dto.ForgotPasswordRequest:
     properties:
       email:
         type: string
     type: object
-  models.LoginRequest:
+  dto.LoginRequest:
     properties:
       email:
         type: string
@@ -14,7 +23,7 @@ definitions:
       password:
         type: string
     type: object
-  models.RegisterRequest:
+  dto.RegisterRequest:
     properties:
       confirm_password:
         type: string
@@ -23,12 +32,20 @@ definitions:
       password:
         type: string
     type: object
+  dto.VerifyOTP:
+    properties:
+      otp:
+        type: string
+    type: object
   utils.Response:
     properties:
       errors:
         type: string
       message:
         type: string
+      otp:
+        type: string
+      result: {}
       success:
         type: boolean
       token:
@@ -40,18 +57,18 @@ info:
   title: fgo24-be-tickitz
   version: "1.0"
 paths:
-  /auth/forgot-password:
+  /auth/change-password:
     post:
       consumes:
       - application/json
-      description: Forgot password
+      description: Change password
       parameters:
-      - description: request forgot password
+      - description: request change password
         in: body
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.ForgotPasswordRequest'
+          $ref: '#/definitions/dto.ChangePasswordRequest'
       produces:
       - application/json
       responses:
@@ -67,6 +84,40 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
+      summary: Handle change password
+      tags:
+      - auth
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Forgot password
+      parameters:
+      - description: request forgot password
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
       summary: Handle forgot password
       tags:
       - auth
@@ -81,7 +132,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.LoginRequest'
+          $ref: '#/definitions/dto.LoginRequest'
       produces:
       - application/json
       responses:
@@ -111,14 +162,14 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/models.RegisterRequest'
+          $ref: '#/definitions/dto.RegisterRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/models.RegisterRequest'
+            $ref: '#/definitions/dto.RegisterRequest'
         "400":
           description: Bad Request
           schema:
@@ -126,4 +177,41 @@ paths:
       summary: Handle register user
       tags:
       - auth
+  /auth/verify-otp:
+    post:
+      consumes:
+      - application/json
+      description: Verify otp
+      parameters:
+      - description: request verify otp
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/dto.VerifyOTP'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
+      summary: Handle verify otp
+      tags:
+      - auth
+securityDefinitions:
+  Token:
+    description: |-
+      Use Bearer token to access protected routes
+      Example: Bearer your_token_here
+      Make sure to include the word "Bearer" followed by a space before the token
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

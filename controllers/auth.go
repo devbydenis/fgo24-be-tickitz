@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"backend-cinemax/config"
+	"backend-cinemax/dto"
 	m "backend-cinemax/models"
 	u "backend-cinemax/utils"
 	"context"
@@ -19,12 +20,12 @@ import (
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body m.RegisterRequest true "request create user"
-// @Success 201 {object} m.RegisterRequest
+// @Param user body dto.RegisterRequest true "request create user"
+// @Success 201 {object} dto.RegisterRequest
 // @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
 // @Router /auth/register [post]
 func RegisterHandler(ctx *gin.Context) {
-	var req m.RegisterRequest
+	var req dto.RegisterRequest
 
 	err := ctx.ShouldBind(&req)
 	if err != nil {
@@ -98,13 +99,13 @@ func RegisterHandler(ctx *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body m.LoginRequest true "request login user"
+// @Param user body dto.LoginRequest true "request login user"
 // @Success 200 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 401 {object} u.Response{Success bool, Message string, Errors any}
 // @Router /auth/login [post]
 func LoginHandler(ctx *gin.Context) {
-	var req m.LoginRequest
+	var req dto.LoginRequest
 
 	err := ctx.ShouldBind(&req)
 	if err != nil {
@@ -132,7 +133,6 @@ func LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-
 	if !m.MatchUserInDatabase(req.Email, req.Password) {
 		ctx.JSON(http.StatusUnauthorized, u.Response{
 			Success: false,
@@ -141,6 +141,7 @@ func LoginHandler(ctx *gin.Context) {
 		return
 	}
 
+	// Generate token
 	token, err := u.GenerateToken(req.ID, req.Email)
 	if err != nil {
 		fmt.Println("LoginHandler error generate token:", err)
@@ -158,13 +159,14 @@ func LoginHandler(ctx *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body m.ForgotPasswordRequest true "request forgot password"
+// @Param user body dto.ForgotPasswordRequest true "request forgot password"
 // @Success 200 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 404 {object} u.Response{Success bool, Message string, Errors any}
+// @Security Token
 // @Router /auth/forgot-password [post]
 func ForgotPasswordHandler(ctx *gin.Context) {
-	var req m.ForgotPasswordRequest
+	var req dto.ForgotPasswordRequest
 	
 	err := ctx.ShouldBind(&req)
 	if err != nil {
@@ -193,7 +195,7 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 	}
 	
 	OTP := u.GenerateOTP()
-	OTPReq := m.OTPRequest{
+	OTPReq := dto.OTPRequest{
 		Email: req.Email,
 		OTP: OTP,
 	}
@@ -228,12 +230,13 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body m.VerifyOTP true "request verify otp"
+// @Param user body dto.VerifyOTP true "request verify otp"
 // @Success 200 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
+// @Security Token
 // @Router /auth/verify-otp [post]
 func VerifyOTPHandler(ctx *gin.Context) {
-	var req m.VerifyOTP
+	var req dto.VerifyOTP
 	ctx.ShouldBind(&req)
 	
 	if req.OTP == "" {
@@ -250,7 +253,7 @@ func VerifyOTPHandler(ctx *gin.Context) {
 		fmt.Println("failed to get value from redis:", err)
 	}
 
-	otp := m.OTPRequest{}
+	otp := dto.OTPRequest{}
 	err = json.Unmarshal([]byte(decoded), &otp)
 	
 	if req.OTP != otp.OTP {
@@ -272,13 +275,14 @@ func VerifyOTPHandler(ctx *gin.Context) {
 // @Tags auth
 // @Accept json
 // @Produce json
-// @Param user body m.ChangePasswordRequest true "request change password"
+// @Param user body dto.ChangePasswordRequest true "request change password"
 // @Success 200 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 404 {object} u.Response{Success bool, Message string, Errors any}
+// @Security Token
 // @Router /auth/change-password [post]
 func ChangePasswordHandler(ctx *gin.Context) {
-	var req m.ChangePasswordRequest
+	var req dto.ChangePasswordRequest
 	fmt.Println("req:", req)
 	ctx.ShouldBind(&req)
 	
@@ -338,11 +342,18 @@ func ChangePasswordHandler(ctx *gin.Context) {
 		Success: true,
 		Message: "Password reset successfully",
 	})
-	
-
-	// ctx.JSON(http.StatusOK, gin.H{
-	// 	"message": "Password reset successfully",
-	// 	"user": u.FindUserByEmail(req.Email),
-	// })
-	
 }
+
+// feat(auth): add change password and verify OTP endpoints with corresponding DTOs and Swagger documentation
+
+// fix(auth): update references from models to dto for request structures in Swagger
+
+// chore(deps): update JWT library to v5 and add Redis dependency
+
+// feat(profile): implement GetProfileHandler and associated DTOs for user profile retrieval
+
+// feat(middleware): add AuthMiddleware for token verification in protected routes
+
+// refactor(utils): improve email sending logic and response structure
+
+// docs: update Swagger documentation for new endpoints and security definitions
