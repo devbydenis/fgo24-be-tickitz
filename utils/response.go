@@ -1,6 +1,7 @@
 package utils
 
 type Response struct {
+	Status  int    `json:"status,omitempty"`
 	Success bool `json:"success"`
 	Message string `json:"message"`
 	Errors string `json:"errors,omitempty"`

@@ -5,7 +5,7 @@ DB_PASSWORD?=1
 DB_NAME?=cinemax
 DB_SSLMODE?=disable
 
-MIGRATION_DIR=./migrations
+MIGRATION_DIR=./db/migrations
 
 MIGRATE=migrate -source "file://$(MIGRATION_DIR)" \
 		-database "postgres://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=$(DB_SSLMODE)"
@@ -17,7 +17,13 @@ migration_up:
 		$(MIGRATE) up
 
 migration_down: 
-		$(MIGRATE) down
+		$(MIGRATE) down 
 
 migration_drop: 
 		$(MIGRATE) drop -f
+
+migration_status:
+		$(MIGRATE) version
+
+migration_force:
+		$(MIGRATE) force $(version)

@@ -1,0 +1,13 @@
+DROP INDEX IF EXISTS idx_movies_id;
+DROP INDEX IF EXISTS idx_movies_title;
+DROP INDEX IF EXISTS idx_movies_release_date;
+DROP INDEX IF EXISTS idx_movies_status;
+DROP INDEX IF EXISTS idx_movies_language;
+DROP INDEX IF EXISTS idx_movies_popularity;
+DROP INDEX IF EXISTS idx_movies_rating;
+DROP INDEX IF EXISTS idx_movies_duration;
+DROP INDEX IF EXISTS idx_movies_backdrop_img;
+DROP INDEX IF EXISTS idx_movies_poster_img;
+DROP INDEX IF EXISTS idx_movies_description;
+DROP INDEX IF EXISTS idx_movies_created_at;
+DROP INDEX IF EXISTS idx_movies_updated_at;

@@ -64,29 +64,30 @@ erDiagram
 
     movies {
         int         id              PK
+        string      backdrop_img
         string      title
         string      synopsis
+        float       popularity
         time        duration
         date        release_date
         string      rating
-        string      backdrop_img
         string      poster_img
         decimal     price
         enum        status          "now playing, coming soon, ended"
         string      language
         datetime    created_at
+        datetime    updated at
     }
 
     movies_casts{
         int     id              PK
         int     movie_id        FK
         int     cast_id         FK
-        string  character_name
     }
     casts {
         int       id            PK
-        string    name
-        string    role
+        string    actor_name
+        string    character_name
         datetime  created_at
         datetime  updated_at
     }

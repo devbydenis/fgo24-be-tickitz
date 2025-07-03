@@ -1,0 +1,13 @@
+CREATE INDEX idx_movies_id ON movies(id);
+CREATE INDEX idx_movies_title ON movies(title);
+CREATE INDEX idx_movies_release_date ON movies(release_date);
+CREATE INDEX idx_movies_status ON movies(status);
+CREATE INDEX idx_movies_language ON movies(language);
+CREATE INDEX idx_movies_popularity ON movies(popularity);
+CREATE INDEX idx_movies_rating ON movies(rating);
+CREATE INDEX idx_movies_duration ON movies(duration);
+CREATE INDEX idx_movies_backdrop_img ON movies(backdrop_img);
+CREATE INDEX idx_movies_poster_img ON movies(poster_img);
+CREATE INDEX idx_movies_description ON movies(description);
+CREATE INDEX idx_movies_created_at ON movies(created_at);
+CREATE INDEX idx_movies_updated_at ON movies(updated_at);
