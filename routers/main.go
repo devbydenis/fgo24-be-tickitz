@@ -11,6 +11,7 @@ import (
 
 func CombineRouters(r *gin.Engine) {
 	authRouters(r.Group("/auth"))
+	profileRouters(r.Group("/profile"))
 
 	// Swagger 
 	docs.SwaggerInfo.BasePath = "/"
