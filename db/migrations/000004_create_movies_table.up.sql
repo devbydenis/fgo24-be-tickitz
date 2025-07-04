@@ -1,4 +1,4 @@
-CREATE TYPE movie_status AS ENUM ('now playing', 'coming soon', 'ended');
+-- CREATE TYPE movie_status AS ENUM ('now playing', 'coming soon', 'ended');
 
 CREATE TABLE movies(
     id SERIAL PRIMARY KEY,
