@@ -10,17 +10,6 @@ import (
 )
 
 func GetNowShowingMoviesHandler(ctx *gin.Context) {
-	// This function will handle the retrieval of now showing movies.
-	// It will use the NowShowingMoviesRequest and NowShowingMoviesResponse structs
-	// to manage the request and response data.
-	// The implementation will involve querying the database for movies that are currently showing,
-	// applying any filters or sorting specified in the request, and returning the results in the response.
-	// The function will also handle pagination, allowing clients to specify the number of results per page
-	// and the page number they want to retrieve.
-	// The response will include the list of movies, the total number of movies available,
-	// the current page, and the limit of results per page.
-	// The function will be implemented in the future.
-	// For now, it will be a placeholder function.
 
 	var req m.NowShowingMoviesRequest
 

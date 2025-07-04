@@ -64,8 +64,8 @@ erDiagram
 
     movies {
         int         id              PK
-        string      backdrop_img
         string      title
+        string      backdrop_img
         string      synopsis
         float       popularity
         time        duration
@@ -76,7 +76,7 @@ erDiagram
         enum        status          "now playing, coming soon, ended"
         string      language
         datetime    created_at
-        datetime    updated at
+        datetime    updated_at
     }
 
     movies_casts{
