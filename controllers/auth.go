@@ -75,7 +75,7 @@ func RegisterHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	
+
 	userUUID := u.GenerateUUID()
 	parseUserUUID, err := uuid.Parse(userUUID)
 	err = m.InsertUserToDB(req.Email, req.Password, parseUserUUID)
@@ -133,18 +133,21 @@ func LoginHandler(ctx *gin.Context) {
 		return
 	}
 
-	if !m.MatchUserInDatabase(req.Email, req.Password) {
+	users, err := m.MatchUserInDB(req.Email, req.Password)
+	fmt.Println("users:", users)
+	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, u.Response{
 			Success: false,
 			Message: "Unauthorized. Make sure your email and password is correct",
+			Errors:  err.Error(),
 		})
 		return
 	}
 
 	// Generate token
-	token, err := u.GenerateToken(req.ID, req.Email)
+	token, err := u.GenerateJWT(users[0].ID, users[0].Email)
 	if err != nil {
-		fmt.Println("LoginHandler error generate token:", err)
+		fmt.Println("LoginHandler error when generate token JWT:", err)
 	}
 
 	ctx.JSON(http.StatusOK, u.Response{
@@ -163,11 +166,10 @@ func LoginHandler(ctx *gin.Context) {
 // @Success 200 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 404 {object} u.Response{Success bool, Message string, Errors any}
-// @Security Token
 // @Router /auth/forgot-password [post]
 func ForgotPasswordHandler(ctx *gin.Context) {
 	var req dto.ForgotPasswordRequest
-	
+
 	err := ctx.ShouldBind(&req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, u.Response{
@@ -177,7 +179,7 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	
+
 	if req.Email == "" {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,
@@ -185,7 +187,7 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	
+
 	if !m.IsEmailExist(req.Email) {
 		ctx.JSON(http.StatusNotFound, u.Response{
 			Success: false,
@@ -193,20 +195,24 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	
+
 	OTP := u.GenerateOTP()
 	OTPReq := dto.OTPRequest{
 		Email: req.Email,
-		OTP: OTP,
+		OTP:   OTP,
 	}
+
 	redisClient := config.RedisConnect()
 	encoded, err := json.Marshal(OTPReq)
-			if err != nil {
-				fmt.Println("failed to marshal json:", err)
-			}
+	if err != nil {
+		fmt.Println("failed to marshal json:", err)
+	}
+	redisClient.Set(
+		context.Background(), "users", 
+		string(encoded), 
+		time.Duration(5)*time.Minute,
+	)
 
-	redisClient.Set(context.Background(), "users", string(encoded), time.Duration(5)*time.Minute)
-	
 	//kirim otp via email
 	// err = u.SendEmailOTP(req.Email, OTP)
 	// if err != nil {
@@ -220,7 +226,8 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, u.Response{
 		Success: true,
-		Message: "OTP sent successfully. Please check your email",
+		// Message: "OTP sent successfully. Please check your email",
+		Message: "OTP sent successfully. Input before 5 minutes",
 		OTP:     OTP,
 	})
 }
@@ -238,7 +245,7 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 func VerifyOTPHandler(ctx *gin.Context) {
 	var req dto.VerifyOTP
 	ctx.ShouldBind(&req)
-	
+
 	if req.OTP == "" {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,
@@ -246,7 +253,7 @@ func VerifyOTPHandler(ctx *gin.Context) {
 		})
 		return
 	}
-		
+
 	redisClient := config.RedisConnect()
 	decoded, err := redisClient.Get(context.Background(), "users").Result()
 	if err != nil {
@@ -255,7 +262,7 @@ func VerifyOTPHandler(ctx *gin.Context) {
 
 	otp := dto.OTPRequest{}
 	err = json.Unmarshal([]byte(decoded), &otp)
-	
+
 	if req.OTP != otp.OTP {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,
@@ -285,23 +292,23 @@ func ChangePasswordHandler(ctx *gin.Context) {
 	var req dto.ChangePasswordRequest
 	fmt.Println("req:", req)
 	ctx.ShouldBind(&req)
-	
-	if req.NewPassword == ""{
+
+	if req.NewPassword == "" {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,
 			Message: "New password are required",
 		})
 		return
 	}
-	
-	if req.ConfirmNewPassword == ""{
+
+	if req.ConfirmNewPassword == "" {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,
 			Message: "Confirm new password are required",
 		})
 		return
 	}
-	
+
 	if len(req.NewPassword) < 8 {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,
@@ -309,7 +316,7 @@ func ChangePasswordHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	
+
 	if req.NewPassword != req.ConfirmNewPassword {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,
@@ -317,7 +324,7 @@ func ChangePasswordHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	
+
 	if !m.IsEmailExist(req.Email) {
 		ctx.JSON(http.StatusNotFound, u.Response{
 			Success: false,
@@ -325,9 +332,9 @@ func ChangePasswordHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	
-	fmt.Println("req email controller", req.Email, req.NewPassword)
-	
+
+	// fmt.Println("req email controller", req.Email, req.NewPassword)
+
 	err := m.UpdateUserPassword(req.Email, req.NewPassword)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, u.Response{
@@ -337,7 +344,7 @@ func ChangePasswordHandler(ctx *gin.Context) {
 		})
 		return
 	}
-	
+
 	ctx.JSON(http.StatusOK, u.Response{
 		Success: true,
 		Message: "Password reset successfully",
