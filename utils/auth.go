@@ -5,17 +5,17 @@ import (
 	"math/rand/v2"
 	// "net/smtp"
 	"os"
-
 	"strconv"
 	"time"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/google/uuid"
 	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/gomail.v2"
 )
 
-func GenerateToken(id uuid.UUID, email string) (string, error) {
+func GenerateJWT(id uuid.UUID, email string) (string, error) {
 	godotenv.Load()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
@@ -44,6 +44,24 @@ func GenerateOTP() string {
 		}
 	}
 	return strconv.Itoa(result)
+}
+
+func HashPassword(password string) (string, error) {
+	hashed, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		fmt.Println("HashPassword error:", err)
+		return "", err
+	}
+	return string(hashed), nil
+}
+
+func VerifyHashPassword(password, hashed string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(password))
+	if err != nil {
+		fmt.Println("VerifyHashPassword error:", err)
+		return false
+	}
+	return true
 }
 
 func SendEmailOTP(emailRecipient, otp string) error {

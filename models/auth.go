@@ -1,8 +1,8 @@
 package models
 
 import (
-	"backend-cinemax/config"
 	c "backend-cinemax/config"
+	u "backend-cinemax/utils"
 	"backend-cinemax/dto"
 	"context"
 	"fmt"
@@ -17,7 +17,7 @@ type IsEmailExistType struct {
 
 func IsEmailExist(email string) bool {
 	// conncect to db
-	conn, err := config.DBConnect()
+	conn, err := c.DBConnect()
 	if err != nil {
 		fmt.Println("IsEmailExist error connet to db:", err)
 		return false
@@ -41,7 +41,7 @@ func IsEmailExist(email string) bool {
 		return false
 	}
 
-	fmt.Println("IsEmailExist users:", users)
+	// check if user exist
 	if len(users) > 0 {
 		return true
 	}
@@ -58,25 +58,58 @@ func InsertUserToDB(email string, password string, userUUID uuid.UUID) error {
 		conn.Conn().Close(context.Background())
 	}()
 
-	_, err = conn.Exec(context.Background(), `
-		INSERT INTO users (id, email, password) VALUES ($1, $2, $3);
-	`, userUUID, email, password,
-)
+	//hash password
+	hashedPassword, err := u.HashPassword(password)
+	if err != nil {
+		fmt.Println("InsertUserToDB error hash password:", err)
+		return err
+	}
 
-	_, err = conn.Exec(context.Background(), `
+	trx, err := conn.Begin(context.Background())
+	if err != nil {
+		fmt.Println("InsertUserToDB error begin transaction:", err)
+		return err
+	}
+	defer trx.Rollback(context.Background())
+
+	var userId uuid.UUID
+	err = trx.QueryRow(context.Background(), `
+		INSERT INTO users (id, email, password)
+		VALUES ($1, $2, $3)
+		RETURNING id;
+`, userUUID, email, hashedPassword,
+	).Scan(&userId)
+	if err != nil && err != pgx.ErrNoRows {
+		fmt.Println("InsertUserToDB error query row:", err)
+		return err
+	}
+
+	_, err = trx.Exec(context.Background(), `
 		INSERT INTO profiles (user_id) VALUES ($1);
-	`, userUUID,
-)
+`, userId,
+	)
+	if err != nil {
+		fmt.Println("InsertUserToDB error insert profile:", err)
+		return err
+	}
 
+	err = trx.Commit(context.Background())
+	if err != nil {
+		fmt.Println("InsertUserToDB error commit transaction:", err)
+		return err
+	}
+
+	
+	fmt.Println("InsertUserToDB success insert user and profile")
 	return err
 }
 
-func MatchUserInDatabase(email string, password string) bool {
+func MatchUserInDB(email string, password string) ([]dto.LoginRequest, error) {
 	// conncect to db
 	conn, err := c.DBConnect()
 	if err != nil {
-		fmt.Println("MatchUserInDatabase error connet to db:", err)
-		return false
+		fmt.Println("MatchUserInDB error connet to db:", err)
+		return nil, err
 	}
 
 	// jangan lupa tutup kalo udah selesai
@@ -84,26 +117,38 @@ func MatchUserInDatabase(email string, password string) bool {
 		conn.Conn().Close(context.Background())
 	}()
 
+	// // hash input password
+	// hashedPassword, err := u.HashPassword(password)
+	// if err != nil {
+	// 	fmt.Println("MatchUserInDB error hash password:", err)
+	// 	return nil, err
+	// }
+
 	// check if email exist
-	rows, err := conn.Query(context.Background(), "SELECT id, email, password FROM users WHERE email = $1 AND password = $2", email, password,)
+	rows, err := conn.Query(context.Background(), "SELECT id, email, password FROM users WHERE email = $1", email)
 	if err != nil {
-		fmt.Println("MatchUserInDatabase error query:", err)
-		return false
+		fmt.Println("MatchUserInDB error query:", err)
+		return nil, err
 	}
 
 	// collect row and map to struxt
 	users, err := pgx.CollectRows[dto.LoginRequest](rows, pgx.RowToStructByName)
 	if err != nil {
-		fmt.Println("MatchUserInDatabase error collect row:", err)
-		return false
+		fmt.Println("MatchUserInDB error collect row:", err)
+		return nil, err
 	}
 	
-	fmt.Println("MatchUserInDatabase users:", users)
+	// check if user exist
 	if len(users) == 0 {
-		return false
+		return nil, fmt.Errorf("user not found")
+	}
+	
+	// compare passwrod from user input with password from db
+	if !u.VerifyHashPassword(password, users[0].Password) {
+		return nil, fmt.Errorf("invalid password")
 	}
 
-	return true
+	return users, nil
 }
 
 func UpdateUserPassword(email string, newPassword string) error {
