@@ -70,6 +70,21 @@ definitions:
       password:
         type: string
     type: object
+  dto.UpdateProfileRequest:
+    properties:
+      firstname:
+        type: string
+      gender:
+        type: string
+      lastname:
+        type: string
+      phone_number:
+        type: string
+      profile_picture:
+        type: string
+      username:
+        type: string
+    type: object
   dto.VerifyOTP:
     properties:
       otp:
@@ -412,6 +427,35 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Handle get profile
+      tags:
+      - profile
+    patch:
+      consumes:
+      - application/json
+      description: Update profile
+      parameters:
+      - description: request update profile
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Handle update profile
       tags:
       - profile
 securityDefinitions:

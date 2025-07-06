@@ -70,6 +70,16 @@ func GetProfileHandler(ctx *gin.Context) {
 	})
 }
 
+// @summary Handle update profile
+// @Description Update profile
+// @Tags profile
+// @Accept json
+// @Produce json
+// @Param profile body dto.UpdateProfileRequest true "request update profile"
+// @Success 200 {object} utils.Response{Success bool, Message string}
+// @Failure 400 {object} utils.Response{Success bool, Message string, Errors any}
+// @Failure 500 {object} utils.Response{Success bool, Message string, Errors any}
+// @Router /profile [patch]
 func UpdateProfileHandler(ctx *gin.Context) {
 	userId := ctx.MustGet("userId").(string)
 
