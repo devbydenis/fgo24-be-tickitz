@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-)
+)	
 
 // @summary Handle create movie with all relations
 // @Description Create a new movie with all relations (genres, casts, directors)
@@ -65,5 +65,36 @@ func CreateAdminHandler(ctx *gin.Context) {
 		Success: true,
 		Message: "success to create new movie",
 		Result:  req,
+	})
+}
+
+// @summary Handle list all movie admin
+// @Description List all movie admin
+// @Tags admin
+// @Accept json
+// @Produce json
+// @Success 200 {object} utils.Response{Status int, Success bool, Message string, Result []m.Admin}
+// @Failure 500 {object} utils.Response{Status int, Success bool, Message string, Result any}
+// @Router /admin/list [get]
+func ListAdminHandler(ctx *gin.Context) {
+	// get all movie admin
+	movies, err := m.GetAllMovieAdmins()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Status:  http.StatusInternalServerError,
+			Success: false,
+			Message: "failed to get all movie admins",
+			Result:  nil,
+		})
+		return
+	}
+
+	// SUCCESS
+	ctx.JSON(http.StatusOK, utils.Response{
+		Status:  http.StatusOK,
+		Success: true,
+		Message: "success to get all movie",
+		Total:  int64(len(movies)),
+		Result:  movies,
 	})
 }

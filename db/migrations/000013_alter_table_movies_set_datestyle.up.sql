@@ -1,0 +1,1 @@
+ALTER DATABASE cinemax SET datestyle TO "ISO, DMY";

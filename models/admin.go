@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -29,6 +30,25 @@ type MoviesRequest struct {
 	Genres      []string   `json:"genres"`
 	Casts       [][]string `json:"casts"`
 	Directors   string     `json:"directors"`
+}
+
+type MoviesResponse struct {
+	ID          int64     		`json:"id"`
+	BackdropImg string    		`json:"backdrop_img"`
+	Title       string    		`json:"title"`
+	Description string    		`json:"description"`
+	Popularity  float32   		`json:"popularity"`
+	Duration    int       		`json:"duration"`
+	ReleaseDate time.Time 		`json:"release_date"`
+	Rating      float32   		`json:"rating"`
+	PosterImg   string    		`json:"poster_img"`
+	Status      string    		`json:"status"` // "now playing", "coming soon", "ended"
+	Language    string    		`json:"language"`
+	Genres      []string  		`json:"genres"`
+	Casts       [][]string 		`json:"casts"`
+	Directors   string    		`json:"directors"`
+	CreatedAt   time.Time     `json:"created_at"`
+	UpdatedAt   time.Time     `json:"updated_at"`
 }
 
 func InsertToMovieTable(trx pgx.Tx, movie MoviesRequest) (int64, error) {
@@ -225,4 +245,101 @@ func CreateMovieWithAllRelations(req MoviesRequest) error {
 	}
 
 	return nil
+}
+
+func GetAllMovieAdmins() ([]MoviesResponse, error) {
+	conn, err := config.DBConnect()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		conn.Conn().Close(context.Background())
+	}()
+
+	query := `
+		SELECT
+				m.id,
+    		m.backdrop_img, 
+        m.title, 
+        m.description, 
+        m.popularity, 
+        m.duration,
+				m.release_date, 
+        m.rating, 
+        m.poster_img, 
+        m.status, 
+        m.language,
+				(
+					SELECT json_agg(g.name)
+					FROM genres g
+					JOIN movies_genres mg ON g.id = mg.genre_id
+					WHERE mg.movie_id = m.id
+				) AS genres,
+				(
+					SELECT json_agg(json_build_array(c.actor_name, mc.character_name))
+					FROM movies_casts mc
+					JOIN casts c ON mc.cast_id = c.id
+					WHERE mc.movie_id = m.id
+					GROUP BY mc.movie_id
+				) AS casts,
+        d.name AS director,
+				m.created_at,
+				m.updated_at
+	FROM movies m
+	JOIN movies_genres mg 
+    ON m.id = mg.movie_id
+	JOIN genres g 
+    ON mg.genre_id = g.id
+	JOIN movies_casts mc 
+    ON m.id = mc.movie_id
+	JOIN casts c 
+    ON mc.cast_id = c.id
+	JOIN movies_directors md 
+    ON m.id = md.movie_id
+	JOIN directors d 
+    ON md.director_id = d.id
+	WHERE m.status = 'now playing' 
+    OR m.status = 'coming soon'
+	GROUP BY m.id, d.name
+	ORDER BY m.title DESC
+	LIMIT 50
+	`
+
+	rows, err := conn.Query(context.Background(), query)
+	if err != nil {
+		fmt.Println("GetAllMovieAdmins error query rows:", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movies []MoviesResponse
+	
+	for rows.Next() {
+		var movie MoviesResponse
+		err = rows.Scan(
+			&movie.ID,
+			&movie.BackdropImg,
+			&movie.Title,
+			&movie.Description,
+			&movie.Popularity,
+			&movie.Duration,
+			&movie.ReleaseDate,
+			&movie.Rating,
+			&movie.PosterImg,
+			&movie.Status,
+			&movie.Language,
+			&movie.Genres,
+			&movie.Casts,
+			&movie.Directors,
+			&movie.CreatedAt,
+			&movie.UpdatedAt,
+		)
+		if err != nil {
+			fmt.Println("GetAllMovieAdmins error scan row:", err)
+			return nil, err
+		}
+		movies = append(movies, movie)
+	}
+
+	return movies, nil
 }
