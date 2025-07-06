@@ -9,7 +9,7 @@ import (
 
 func profileRouters(r *gin.RouterGroup) {
 	r.GET("", m.AuthMiddleware(), c.GetProfileHandler) 
-	// r.PATCH("/profile", m.AuthMiddleware(), c.UpdateProfileHandler)
+	r.PATCH("", m.AuthMiddleware(), c.UpdateProfileHandler)
 	// r.DELETE("/profile", c.DeleteProfileHandler)
 	
 }

@@ -58,3 +58,40 @@ func GetUserByUserId(userId string) (dto.GetProfileResponse, error) {
 
 	return users[0], nil
 }
+
+func UpdateUser(userId string, req dto.UpdateProfileRequest) error {
+	conn, err := config.DBConnect()
+	if err != nil {
+		return err
+	}
+	defer func(){
+		conn.Conn().Close(context.Background())
+	}()
+
+		// fmt.Println("UpdateUser req:", req.Firstname)
+
+	query := `
+		UPDATE profiles 
+		SET username = COALESCE($1, username),
+				firstname = COALESCE($2, firstname),
+				lastname = COALESCE($3, lastname),
+				phone_number = COALESCE($4, phone_number),
+				gender = COALESCE($5, gender),
+				profile_picture = COALESCE($6, profile_picture) 
+		WHERE user_id = $7;
+		`
+
+	_, err = conn.Exec(
+			context.Background(), 
+			query, 
+			req.Username, 
+			req.Firstname, 
+			req.Lastname, 
+			req.PhoneNumber, 
+			req.Gender, 
+			req.ProfilePicture, 
+			userId,
+	)
+
+	return err
+}

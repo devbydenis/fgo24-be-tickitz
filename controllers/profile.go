@@ -10,6 +10,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+
+// @summary Handle get profile
+// @Description Get profile
+// @Tags profile
+// @Accept json
+// @Produce json
+// @Success 200 {object} utils.Response{Success bool, Message string, Result dto.GetProfileResponse}
+// @Failure 400 {object} utils.Response{Success bool, Message string, Errors any}
+// @Failure 401 {object} utils.Response{Success bool, Message string, Errors any}
+// @Router /profile [get]
 func GetProfileHandler(ctx *gin.Context) {
 	token := ctx.GetHeader("Authorization")
 	fmt.Println(ctx.GetHeader("Authorization"))
@@ -60,3 +70,24 @@ func GetProfileHandler(ctx *gin.Context) {
 	})
 }
 
+func UpdateProfileHandler(ctx *gin.Context) {
+	userId := ctx.MustGet("userId").(string)
+
+	var req dto.UpdateProfileRequest
+	ctx.ShouldBind(&req)
+
+	err := models.UpdateUser(userId, req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Success: false,
+			Message: "Internal Server Error",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, utils.Response{
+		Success: true,
+		Message: "Profile updated successfully",
+	})
+}
