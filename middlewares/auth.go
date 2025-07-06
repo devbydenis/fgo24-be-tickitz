@@ -28,7 +28,7 @@ func VerifyToken(token string) (*jwt.Token, error) {
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		headerAuth := ctx.GetHeader("Authorization")	// ambil header Authorization buat dicek tokennya
-		fmt.Println("headerAuth:", headerAuth)
+		// fmt.Println("headerAuth:", headerAuth)
 		if headerAuth == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, utils.Response{	// abort buat menghentikan eksekusi middleware selanjutnya
 				Success: false,
@@ -58,9 +58,17 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		if claims, ok := verifiedToken.Claims.(jwt.MapClaims); ok {
-			if idFloat, ok := claims["id"].(float64); ok {
-				userId := int(idFloat)
-				ctx.Set("userId", userId)
+			userId, ok := claims["id"].(string);
+			if !ok || userId == "" {
+				ctx.AbortWithStatusJSON(http.StatusUnauthorized, utils.Response{
+            Success: false,
+            Message: "Unauthorized - Invalid or missing 'userId' in token",
+        })
+        return
+			}
+			ctx.Set("userId", userId)
+			if email, ok := claims["email"].(string); ok {
+				ctx.Set("email", email)
 			}
 		}
 		ctx.Next()

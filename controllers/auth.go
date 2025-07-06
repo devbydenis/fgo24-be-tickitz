@@ -150,6 +150,8 @@ func LoginHandler(ctx *gin.Context) {
 		fmt.Println("LoginHandler error when generate token JWT:", err)
 	}
 
+	ctx.Header("Authorization", "Bearer " + token)
+
 	ctx.JSON(http.StatusOK, u.Response{
 		Success: true,
 		Message: "Login Success",
