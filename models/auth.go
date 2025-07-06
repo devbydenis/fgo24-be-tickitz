@@ -98,7 +98,6 @@ func InsertUserToDB(email string, password string, userUUID uuid.UUID) error {
 		fmt.Println("InsertUserToDB error commit transaction:", err)
 		return err
 	}
-
 	
 	fmt.Println("InsertUserToDB success insert user and profile")
 	return err

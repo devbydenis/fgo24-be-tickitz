@@ -7,3 +7,25 @@ INSERT INTO users (username, email, password, role) VALUES
 
 SELECT * FROM users;
 SELECT * FROM users WHERE email = 'denis@gmail.com'
+
+INSERT INTO genres (name) VALUES
+('Action'),
+('Comedy'),
+('Drama'),
+('Horror'),
+('Sci-Fi'),
+('Romance'),
+('Thriller'),
+('Adventure'),
+('Fantasy'),
+('Animation'),
+('Documentary'),
+('Mystery'),
+('Crime'),
+('Family'),
+('Musical'),
+('Western'),
+('War'),
+('History');
+
+SELECT id FROM genres WHERE name = 'War';

@@ -15,6 +15,52 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin": {
+            "post": {
+                "description": "Create a new movie with all relations (genres, casts, directors)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Handle create movie with all relations",
+                "parameters": [
+                    {
+                        "description": "request create movie",
+                        "name": "movie",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.MoviesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/change-password": {
             "post": {
                 "security": [
@@ -68,11 +114,6 @@ const docTemplate = `{
         },
         "/auth/forgot-password": {
             "post": {
-                "security": [
-                    {
-                        "Token": []
-                    }
-                ],
                 "description": "Forgot password",
                 "consumes": [
                     "application/json"
@@ -308,6 +349,61 @@ const docTemplate = `{
                 }
             }
         },
+        "models.MoviesRequest": {
+            "type": "object",
+            "properties": {
+                "backdrop_img": {
+                    "description": "ID          int     ` + "`" + `json:\"id\"` + "`" + `",
+                    "type": "string"
+                },
+                "casts": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "description": {
+                    "type": "string"
+                },
+                "directors": {
+                    "type": "string"
+                },
+                "duration": {
+                    "type": "integer"
+                },
+                "genres": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "language": {
+                    "type": "string"
+                },
+                "popularity": {
+                    "type": "number"
+                },
+                "poster_img": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number"
+                },
+                "release_date": {
+                    "type": "string"
+                },
+                "status": {
+                    "description": "\"now playing\", \"coming soon\", \"ended\"",
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
         "utils.Response": {
             "type": "object",
             "properties": {
@@ -321,6 +417,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "result": {},
+                "status": {
+                    "type": "integer"
+                },
                 "success": {
                     "type": "boolean"
                 },

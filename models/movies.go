@@ -8,11 +8,28 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+type Genre struct {
+	ID   int    `json:"id" db:"id"`
+	Name string `json:"name"`
+}
+
+type Director struct {
+	ID   int    `json:"id" db:"id"`
+	Name string `json:"name" db:"name"`
+}
+
+type Cast struct {
+	ID        int    `json:"id" db:"id"`
+	ActorName string `json:"actor_name" db:"actor_name"`
+	CharacterName string `json:"character_name" db:"character_name"`
+
+}
+
 type Movies struct {
-	ID          int     `json:"id" gorm:"primaryKey"`
+	ID          int     `json:"id"`
 	BackdropImg string  `json:"backdrop_img"`
 	Title       string  `json:"title"`
-	Synopsis    string  `json:"synopsis"`
+	Description string  `json:"description"`
 	Popularity  float32 `json:"popularity"`
 	Duration    int     `json:"duration"`
 	ReleaseDate string  `json:"release_date"`
@@ -20,8 +37,8 @@ type Movies struct {
 	PosterImg   string  `json:"poster_img"`
 	Status      string  `json:"status"` // "now playing", "coming soon", "ended"
 	Language    string  `json:"language"`
-	CreatedAt   string  `json:"created_at"`
-	UpdatedAt   string  `json:"updated_at"`
+	// CreatedAt   string  `json:"created_at"`
+	// UpdatedAt   string  `json:"updated_at"`
 }
 
 type NowShowingMoviesRequest struct {

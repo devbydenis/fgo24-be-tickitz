@@ -37,6 +37,43 @@ definitions:
       otp:
         type: string
     type: object
+  models.MoviesRequest:
+    properties:
+      backdrop_img:
+        description: ID          int     `json:"id"`
+        type: string
+      casts:
+        items:
+          items:
+            type: string
+          type: array
+        type: array
+      description:
+        type: string
+      directors:
+        type: string
+      duration:
+        type: integer
+      genres:
+        items:
+          type: string
+        type: array
+      language:
+        type: string
+      popularity:
+        type: number
+      poster_img:
+        type: string
+      rating:
+        type: number
+      release_date:
+        type: string
+      status:
+        description: '"now playing", "coming soon", "ended"'
+        type: string
+      title:
+        type: string
+    type: object
   utils.Response:
     properties:
       errors:
@@ -46,6 +83,8 @@ definitions:
       otp:
         type: string
       result: {}
+      status:
+        type: integer
       success:
         type: boolean
       token:
@@ -57,6 +96,36 @@ info:
   title: fgo24-be-tickitz
   version: "1.0"
 paths:
+  /admin:
+    post:
+      consumes:
+      - application/json
+      description: Create a new movie with all relations (genres, casts, directors)
+      parameters:
+      - description: request create movie
+        in: body
+        name: movie
+        required: true
+        schema:
+          $ref: '#/definitions/models.MoviesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Handle create movie with all relations
+      tags:
+      - admin
   /auth/change-password:
     post:
       consumes:
@@ -116,8 +185,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/utils.Response'
-      security:
-      - Token: []
       summary: Handle forgot password
       tags:
       - auth
