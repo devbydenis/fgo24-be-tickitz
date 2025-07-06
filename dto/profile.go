@@ -9,3 +9,4 @@ type GetProfileResponse struct {
 	Gender string `json:"gender" form:"gender" db:"gender"`
 	ProfilePicture string `json:"profile_picture" form:"profile_picture" db:"profile_picture"`
 }
+

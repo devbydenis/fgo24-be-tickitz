@@ -4,12 +4,28 @@ import (
 	"backend-cinemax/dto"
 	"backend-cinemax/models"
 	"backend-cinemax/utils"
-	"github.com/gin-gonic/gin"
+	"fmt"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 func GetProfileHandler(ctx *gin.Context) {
-	email := ctx.Param("email")
+	token := ctx.GetHeader("Authorization")
+	fmt.Println(ctx.GetHeader("Authorization"))
+
+	userId := ctx.MustGet("userId").(string)
+	email := ctx.MustGet("email").(string)
+	fmt.Println("userId di context:", userId)
+	fmt.Println("email di context:", email)
+
+	if token == "" {
+		ctx.JSON(http.StatusUnauthorized, utils.Response{
+			Success: false,
+			Message: "Unauthorized",
+		})
+		return
+	}
 
 	if email == "" {
 		ctx.JSON(http.StatusBadRequest, utils.Response{
@@ -19,7 +35,7 @@ func GetProfileHandler(ctx *gin.Context) {
 		return
 	}
 
-	user, err := models.GetUserByEmail(email)
+	user, err := models.GetUserByUserId(userId)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.Response{
 			Success: false,
@@ -40,6 +56,7 @@ func GetProfileHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.Response{
 		Success: true,
 		Message: "Profile retrieved successfully",
-		Result:    user,
+		Result: user,
 	})
 }
+

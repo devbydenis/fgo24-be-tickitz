@@ -9,7 +9,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func GetUserByEmail(email string) (dto.GetProfileResponse, error) {
+func GetUserByUserId(userId string) (dto.GetProfileResponse, error) {
 		// conncect to db
 	conn, err := config.DBConnect()
 	if err != nil {
@@ -35,9 +35,9 @@ func GetUserByEmail(email string) (dto.GetProfileResponse, error) {
 				COALESCE(p.profile_picture, '') as profile_picture
 			FROM users u
 			LEFT JOIN profiles p ON u.id = p.user_id
-			WHERE u.email = $1;
+			WHERE u.id = $1;
 		`, 
-		email,
+		userId,
 	)
 	if err != nil {
 		fmt.Println("GetUserByEmail error query:", err)

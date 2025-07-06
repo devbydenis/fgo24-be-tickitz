@@ -353,6 +353,67 @@ paths:
       summary: Handle verify otp
       tags:
       - auth
+  /movies/now-showing:
+    get:
+      consumes:
+      - application/json
+      description: Get now showing movies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get now showing movies
+      tags:
+      - movies
+  /movies/up-coming:
+    get:
+      consumes:
+      - application/json
+      description: Get up coming movies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get up coming movies
+      tags:
+      - movies
+  /profile:
+    get:
+      consumes:
+      - application/json
+      description: Get profile
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Handle get profile
+      tags:
+      - profile
 securityDefinitions:
   Token:
     description: |-

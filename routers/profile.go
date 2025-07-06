@@ -2,13 +2,14 @@ package routers
 
 import (
 	c "backend-cinemax/controllers"
+	m "backend-cinemax/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
 
 func profileRouters(r *gin.RouterGroup) {
-	r.GET("/:email", c.GetProfileHandler) 
-	// r.PUT("/profile", c.UpdateProfileHandler)
+	r.GET("", m.AuthMiddleware(), c.GetProfileHandler) 
+	// r.PATCH("/profile", m.AuthMiddleware(), c.UpdateProfileHandler)
 	// r.DELETE("/profile", c.DeleteProfileHandler)
 	
 }
