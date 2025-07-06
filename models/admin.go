@@ -2,56 +2,17 @@ package models
 
 import (
 	"backend-cinemax/config"
+	"backend-cinemax/dto"
+	// u "backend-cinemax/utils"
 	"context"
 	"errors"
 	"fmt"
-	"time"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 )
 
-type CastRequest struct {
-	Name string `json:"name"`
-	Role string `json:"role"`
-}
-
-type MoviesRequest struct {
-	// ID          int     `json:"id"`
-	BackdropImg string     `json:"backdrop_img"`
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Popularity  float32    `json:"popularity"`
-	Duration    int        `json:"duration"`
-	ReleaseDate string     `json:"release_date"`
-	Rating      float32    `json:"rating"`
-	PosterImg   string     `json:"poster_img"`
-	Status      string     `json:"status"` // "now playing", "coming soon", "ended"
-	Language    string     `json:"language"`
-	Genres      []string   `json:"genres"`
-	Casts       [][]string `json:"casts"`
-	Directors   string     `json:"directors"`
-}
-
-type MoviesResponse struct {
-	ID          int64     		`json:"id"`
-	BackdropImg string    		`json:"backdrop_img"`
-	Title       string    		`json:"title"`
-	Description string    		`json:"description"`
-	Popularity  float32   		`json:"popularity"`
-	Duration    int       		`json:"duration"`
-	ReleaseDate time.Time 		`json:"release_date"`
-	Rating      float32   		`json:"rating"`
-	PosterImg   string    		`json:"poster_img"`
-	Status      string    		`json:"status"` // "now playing", "coming soon", "ended"
-	Language    string    		`json:"language"`
-	Genres      []string  		`json:"genres"`
-	Casts       [][]string 		`json:"casts"`
-	Directors   string    		`json:"directors"`
-	CreatedAt   time.Time     `json:"created_at"`
-	UpdatedAt   time.Time     `json:"updated_at"`
-}
-
-func InsertToMovieTable(trx pgx.Tx, movie MoviesRequest) (int64, error) {
+func InsertToMovieTable(trx pgx.Tx, movie dto.MoviesRequest) (int64, error) {
 	// prepare the query
 	queryMovies := `	INSERT INTO movies (backdrop_img, title, description, popularity, duration, release_date,
 		rating, poster_img, status, language, created_at, updated_at)
@@ -197,7 +158,7 @@ func InsertToDirectorsTable(trx pgx.Tx, directors string, movieId int64) error {
 	return nil
 }
 
-func CreateMovieWithAllRelations(req MoviesRequest) error {
+func CreateMovieWithAllRelations(req dto.MoviesRequest) error {
 	// connect to db
 	conn, err := config.DBConnect()
 	if err != nil {
@@ -247,7 +208,7 @@ func CreateMovieWithAllRelations(req MoviesRequest) error {
 	return nil
 }
 
-func GetAllMovieAdmins() ([]MoviesResponse, error) {
+func GetAllMovieAdmin() ([]dto.MoviesResponse, error) {
 	conn, err := config.DBConnect()
 	if err != nil {
 		return nil, err
@@ -312,10 +273,10 @@ func GetAllMovieAdmins() ([]MoviesResponse, error) {
 	}
 	defer rows.Close()
 
-	var movies []MoviesResponse
-	
+	var movies []dto.MoviesResponse
+
 	for rows.Next() {
-		var movie MoviesResponse
+		var movie dto.MoviesResponse
 		err = rows.Scan(
 			&movie.ID,
 			&movie.BackdropImg,
@@ -342,4 +303,100 @@ func GetAllMovieAdmins() ([]MoviesResponse, error) {
 	}
 
 	return movies, nil
+}
+
+func UpdateMovieAdmin(req dto.MoviesRequest) error {
+	// connect to db
+	conn, err := config.DBConnect()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		conn.Conn().Close(context.Background())
+	}()
+
+	// update field yang hanya ada di request aja
+    query := "UPDATE movies SET "
+    params := []interface{}{}
+    paramCount := 1
+    
+    if req.Title != "" {
+        query += fmt.Sprintf("title = $%d, ", paramCount)
+        params = append(params, req.Title)
+        paramCount++
+    }
+    
+    if req.BackdropImg != "" {
+        query += fmt.Sprintf("backdrop_img = $%d, ", paramCount)
+        params = append(params, req.BackdropImg)
+        paramCount++
+    }
+
+		if req.Description != "" {
+				query += fmt.Sprintf("description = $%d, ", paramCount)
+				params = append(params, req.Description)
+				paramCount++
+		}
+
+		if req.PosterImg != "" {
+				query += fmt.Sprintf("poster_img = $%d, ", paramCount)
+				params = append(params, req.PosterImg)
+				paramCount++
+		}
+
+		if req.Duration != 0 {
+				query += fmt.Sprintf("duration = $%d, ", paramCount)
+				params = append(params, req.Duration)
+				paramCount++
+		}
+
+		if req.Popularity != 0 {
+				query += fmt.Sprintf("popularity = $%d, ", paramCount)
+				params = append(params, req.Popularity)
+				paramCount++
+		}
+
+		if req.Rating != 0 {
+				query += fmt.Sprintf("rating = $%d, ", paramCount)
+				params = append(params, req.Rating)
+				paramCount++
+		}
+
+		if req.Language != "" {
+				query += fmt.Sprintf("language = $%d, ", paramCount)
+				params = append(params, req.Language)
+				paramCount++
+		}
+
+		if req.Status != "" {
+				query += fmt.Sprintf("status = $%d, ", paramCount)
+				params = append(params, req.Status)
+				paramCount++
+		}
+
+		if req.ReleaseDate != "" {
+				query += fmt.Sprintf("release_date = $%d, ", paramCount)
+				params = append(params, req.ReleaseDate)
+				paramCount++
+		}
+
+		// if req.Directors != "" {
+		// 		query += fmt.Sprintf("directors = $%d, ", paramCount)
+		// 		params = append(params, req.Directors)
+		// 		paramCount++
+		// }
+
+		// Hapus koma terakhir
+    query = strings.TrimSuffix(query, ", ")
+    
+    // Tambahin WHERE clause
+    query += fmt.Sprintf(" WHERE id = $%d", paramCount)
+    params = append(params, req.ID)
+    
+    _, err = conn.Exec(context.Background(), query, params...)
+		if err != nil {
+				fmt.Println("UpdateMovieAdmin error exec row:", err)
+				return err
+		}
+		return nil
 }

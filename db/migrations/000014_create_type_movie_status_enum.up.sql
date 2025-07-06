@@ -1,0 +1,1 @@
+CREATE TYPE movies_status AS ENUM ('now playing', 'coming soon', 'ended');

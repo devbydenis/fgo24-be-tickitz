@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"backend-cinemax/dto"
 	m "backend-cinemax/models"
 	"backend-cinemax/utils"
 
@@ -8,7 +9,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-)	
+)
 
 // @summary Handle create movie with all relations
 // @Description Create a new movie with all relations (genres, casts, directors)
@@ -21,7 +22,7 @@ import (
 // @Failure 500 {object} utils.Response{Status int, Success bool, Message string, Result any}
 // @Router /admin [post]
 func CreateAdminHandler(ctx *gin.Context) {
-	var req m.MoviesRequest
+	var req dto.MoviesRequest
 
 	// bind request to struct
 	err := ctx.ShouldBind(&req)
@@ -78,7 +79,7 @@ func CreateAdminHandler(ctx *gin.Context) {
 // @Router /admin/list [get]
 func ListAdminHandler(ctx *gin.Context) {
 	// get all movie admin
-	movies, err := m.GetAllMovieAdmins()
+	movies, err := m.GetAllMovieAdmin()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, utils.Response{
 			Status:  http.StatusInternalServerError,
@@ -96,5 +97,53 @@ func ListAdminHandler(ctx *gin.Context) {
 		Message: "success to get all movie",
 		Total:  int64(len(movies)),
 		Result:  movies,
+	})
+}
+
+func UpdateAdminHandler(ctx *gin.Context) {
+	var req dto.MoviesRequest
+
+	// bind request to struct
+	err := ctx.ShouldBind(&req)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, utils.Response{
+			Status:  http.StatusBadRequest,
+			Success: false,
+			Message: "failed to bind request",
+			Result:  nil,
+		})
+		return
+	}
+
+	// // check required fields
+	// fieldError := utils.CheckFieldValues(req)
+	// if fieldError != "" {
+	// 	ctx.JSON(http.StatusBadRequest, utils.Response{
+	// 		Status:  http.StatusBadRequest,
+	// 		Success: false,
+	// 		Message: fieldError,
+	// 		Result:  nil,
+	// 	})
+	// 	return
+	// }
+
+	// update movie with all relations
+	err = m.UpdateMovieAdmin(req)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Status:  http.StatusInternalServerError,
+			Success: false,
+			Message: "failed to update movie with all relations",
+			Result:  nil,
+		})
+		return
+	}
+
+	// SUCCESS
+	ctx.JSON(http.StatusOK, utils.Response{
+		Status:  http.StatusOK,
+		Success: true,
+		Message: "success to update movie",
+		Result:  req,
 	})
 }

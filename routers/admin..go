@@ -9,6 +9,6 @@ import (
 func adminRouters(r *gin.RouterGroup) {
 	r.POST("", c.CreateAdminHandler)
 	r.GET("/list", c.ListAdminHandler)
-	// r.PATCH("/update/:id", c.UpdateAdminHandler)
+	r.PATCH("/update", c.UpdateAdminHandler)
 	// r.DELETE("/delete/:id", c.DeleteAdminHandler)
 }

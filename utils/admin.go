@@ -57,3 +57,10 @@ func CheckFieldValues(s interface{}) string {
 
 	return result
 }
+
+func ToNullString(s string) interface{} {
+    if s == "" {
+        return nil
+    }
+    return s
+}
