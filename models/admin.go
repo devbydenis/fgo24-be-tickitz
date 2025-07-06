@@ -400,3 +400,23 @@ func UpdateMovieAdmin(req dto.MoviesRequest) error {
 		}
 		return nil
 }
+
+func DeleteMovieAdmin(id int) error {
+	// connect to db
+	conn, err := config.DBConnect()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		conn.Conn().Close(context.Background())
+	}()
+	
+	query := `DELETE FROM movies WHERE id = $1`
+	_, err = conn.Exec(context.Background(), query, id)
+	if err != nil {
+		fmt.Println("DeleteMovieAdmin error exec row:", err)
+		return err
+	}
+
+	return nil
+}

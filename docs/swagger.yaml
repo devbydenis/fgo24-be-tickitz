@@ -23,24 +23,9 @@ definitions:
       password:
         type: string
     type: object
-  dto.RegisterRequest:
-    properties:
-      confirm_password:
-        type: string
-      email:
-        type: string
-      password:
-        type: string
-    type: object
-  dto.VerifyOTP:
-    properties:
-      otp:
-        type: string
-    type: object
-  models.MoviesRequest:
+  dto.MoviesRequest:
     properties:
       backdrop_img:
-        description: ID          int     `json:"id"`
         type: string
       casts:
         items:
@@ -58,6 +43,8 @@ definitions:
         items:
           type: string
         type: array
+      id:
+        type: integer
       language:
         type: string
       popularity:
@@ -72,6 +59,20 @@ definitions:
         description: '"now playing", "coming soon", "ended"'
         type: string
       title:
+        type: string
+    type: object
+  dto.RegisterRequest:
+    properties:
+      confirm_password:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  dto.VerifyOTP:
+    properties:
+      otp:
         type: string
     type: object
   utils.Response:
@@ -89,6 +90,8 @@ definitions:
         type: boolean
       token:
         type: string
+      total:
+        type: integer
     type: object
 info:
   contact: {}
@@ -107,7 +110,7 @@ paths:
         name: movie
         required: true
         schema:
-          $ref: '#/definitions/models.MoviesRequest'
+          $ref: '#/definitions/dto.MoviesRequest'
       produces:
       - application/json
       responses:
@@ -124,6 +127,84 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Handle create movie with all relations
+      tags:
+      - admin
+  /admin/delete/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a movie admin by ID
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Handle delete movie admin
+      tags:
+      - admin
+  /admin/list:
+    get:
+      consumes:
+      - application/json
+      description: List all movie admin
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Handle list all movie admin
+      tags:
+      - admin
+  /admin/update:
+    patch:
+      consumes:
+      - application/json
+      description: Update a movie with all relations (genres, casts, directors)
+      parameters:
+      - description: request update movie
+        in: body
+        name: movie
+        required: true
+        schema:
+          $ref: '#/definitions/dto.MoviesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Handle update movie with all relations
       tags:
       - admin
   /auth/change-password:

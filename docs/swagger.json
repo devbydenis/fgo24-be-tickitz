@@ -28,7 +28,126 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.MoviesRequest"
+                            "$ref": "#/definitions/dto.MoviesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/delete/{id}": {
+            "delete": {
+                "description": "Delete a movie admin by ID",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Handle delete movie admin",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Movie ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/list": {
+            "get": {
+                "description": "List all movie admin",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Handle list all movie admin",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/update": {
+            "patch": {
+                "description": "Update a movie with all relations (genres, casts, directors)",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Handle update movie with all relations",
+                "parameters": [
+                    {
+                        "description": "request update movie",
+                        "name": "movie",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.MoviesRequest"
                         }
                     }
                 ],
@@ -320,33 +439,10 @@
                 }
             }
         },
-        "dto.RegisterRequest": {
-            "type": "object",
-            "properties": {
-                "confirm_password": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.VerifyOTP": {
-            "type": "object",
-            "properties": {
-                "otp": {
-                    "type": "string"
-                }
-            }
-        },
-        "models.MoviesRequest": {
+        "dto.MoviesRequest": {
             "type": "object",
             "properties": {
                 "backdrop_img": {
-                    "description": "ID          int     `json:\"id\"`",
                     "type": "string"
                 },
                 "casts": {
@@ -373,6 +469,9 @@
                         "type": "string"
                     }
                 },
+                "id": {
+                    "type": "integer"
+                },
                 "language": {
                     "type": "string"
                 },
@@ -393,6 +492,28 @@
                     "type": "string"
                 },
                 "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.RegisterRequest": {
+            "type": "object",
+            "properties": {
+                "confirm_password": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.VerifyOTP": {
+            "type": "object",
+            "properties": {
+                "otp": {
                     "type": "string"
                 }
             }
@@ -418,6 +539,9 @@
                 },
                 "token": {
                     "type": "string"
+                },
+                "total": {
+                    "type": "integer"
                 }
             }
         }

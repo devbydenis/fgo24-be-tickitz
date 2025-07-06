@@ -7,8 +7,8 @@ import (
 )
 
 func adminRouters(r *gin.RouterGroup) {
-	r.POST("", c.CreateAdminHandler)
-	r.GET("/list", c.ListAdminHandler)
-	r.PATCH("/update", c.UpdateAdminHandler)
-	// r.DELETE("/delete/:id", c.DeleteAdminHandler)
+	r.POST("", c.CreateMovieAdminHandler)
+	r.GET("/list", c.ListMovieAdminHandler)
+	r.PATCH("/update", c.UpdateMovieAdminHandler)
+	r.DELETE("/delete/:id", c.DeleteMovieAdminHandler)
 }
