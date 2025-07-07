@@ -51,6 +51,7 @@ func GetUserByUserId(userId string) (dto.GetProfileResponse, error) {
 		fmt.Println("GetUserByEmail error collect row:", err)
 		return dto.GetProfileResponse{}, err
 	}
+	
 	// check if user found
 	if len(users) == 0 {
 		return dto.GetProfileResponse{}, fmt.Errorf("user not found")
@@ -60,6 +61,7 @@ func GetUserByUserId(userId string) (dto.GetProfileResponse, error) {
 }
 
 func UpdateUser(userId string, req dto.UpdateProfileRequest) error {
+	// conncect to db
 	conn, err := config.DBConnect()
 	if err != nil {
 		return err
@@ -68,8 +70,7 @@ func UpdateUser(userId string, req dto.UpdateProfileRequest) error {
 		conn.Conn().Close(context.Background())
 	}()
 
-		// fmt.Println("UpdateUser req:", req.Firstname)
-
+	// set default value if request is empty
 	query := `
 		UPDATE profiles 
 		SET username = COALESCE($1, username),

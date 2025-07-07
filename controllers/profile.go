@@ -4,7 +4,6 @@ import (
 	"backend-cinemax/dto"
 	"backend-cinemax/models"
 	"backend-cinemax/utils"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -23,12 +22,8 @@ import (
 // @Router /profile [get]
 func GetProfileHandler(ctx *gin.Context) {
 	token := ctx.GetHeader("Authorization")
-	fmt.Println(ctx.GetHeader("Authorization"))
-
 	userId := ctx.MustGet("userId").(string)
 	email := ctx.MustGet("email").(string)
-	fmt.Println("userId di context:", userId)
-	fmt.Println("email di context:", email)
 
 	if token == "" {
 		ctx.JSON(http.StatusUnauthorized, utils.Response{
@@ -85,7 +80,7 @@ func GetProfileHandler(ctx *gin.Context) {
 func UpdateProfileHandler(ctx *gin.Context) {
 	userId := ctx.MustGet("userId").(string)
 
-	var req dto.UpdateProfileRequest
+	var req dto.UpdateProfileRequest	// pointer to string to make it nullable
 	ctx.ShouldBind(&req)
 
 	err := models.UpdateUser(userId, req)
