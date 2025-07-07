@@ -182,11 +182,6 @@ const docTemplate = `{
         },
         "/auth/change-password": {
             "post": {
-                "security": [
-                    {
-                        "Token": []
-                    }
-                ],
                 "description": "Change password",
                 "consumes": [
                     "application/json"
@@ -365,11 +360,6 @@ const docTemplate = `{
         },
         "/auth/verify-otp": {
             "post": {
-                "security": [
-                    {
-                        "Token": []
-                    }
-                ],
                 "description": "Verify otp",
                 "consumes": [
                     "application/json"
@@ -468,6 +458,11 @@ const docTemplate = `{
         },
         "/profile": {
             "get": {
+                "security": [
+                    {
+                        "Token": []
+                    }
+                ],
                 "description": "Get profile",
                 "consumes": [
                     "application/json"
@@ -501,6 +496,11 @@ const docTemplate = `{
                 }
             },
             "patch": {
+                "security": [
+                    {
+                        "Token": []
+                    }
+                ],
                 "description": "Update profile",
                 "consumes": [
                     "application/json"
@@ -554,6 +554,9 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "email": {
+                    "type": "string"
+                },
+                "id": {
                     "type": "string"
                 },
                 "new_password": {

@@ -6,6 +6,8 @@ definitions:
         type: string
       email:
         type: string
+      id:
+        type: string
       new_password:
         type: string
     type: object
@@ -249,8 +251,6 @@ paths:
           description: Not Found
           schema:
             $ref: '#/definitions/utils.Response'
-      security:
-      - Token: []
       summary: Handle change password
       tags:
       - auth
@@ -363,8 +363,6 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.Response'
-      security:
-      - Token: []
       summary: Handle verify otp
       tags:
       - auth
@@ -426,6 +424,8 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
       summary: Handle get profile
       tags:
       - profile
@@ -455,6 +455,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
       summary: Handle update profile
       tags:
       - profile

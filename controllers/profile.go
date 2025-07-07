@@ -19,6 +19,7 @@ import (
 // @Success 200 {object} utils.Response{Success bool, Message string, Result dto.GetProfileResponse}
 // @Failure 400 {object} utils.Response{Success bool, Message string, Errors any}
 // @Failure 401 {object} utils.Response{Success bool, Message string, Errors any}
+// @Security Token
 // @Router /profile [get]
 func GetProfileHandler(ctx *gin.Context) {
 	token := ctx.GetHeader("Authorization")
@@ -79,6 +80,7 @@ func GetProfileHandler(ctx *gin.Context) {
 // @Success 200 {object} utils.Response{Success bool, Message string}
 // @Failure 400 {object} utils.Response{Success bool, Message string, Errors any}
 // @Failure 500 {object} utils.Response{Success bool, Message string, Errors any}
+// @Security Token
 // @Router /profile [patch]
 func UpdateProfileHandler(ctx *gin.Context) {
 	userId := ctx.MustGet("userId").(string)
