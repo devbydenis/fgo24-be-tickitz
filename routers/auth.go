@@ -11,5 +11,4 @@ func authRouters(r *gin.RouterGroup)  {
 	r.POST("/login", c.LoginHandler)
 	r.POST("/forgot-password", c.ForgotPasswordHandler)
 	r.POST("/change-password", c.ChangePasswordHandler)
-	r.POST("/verify-otp", c.VerifyOTPHandler)
 }

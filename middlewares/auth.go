@@ -28,7 +28,7 @@ func VerifyToken(token string) (*jwt.Token, error) {
 func AuthMiddleware() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		headerAuth := ctx.GetHeader("Authorization")	// ambil header Authorization buat dicek tokennya
-		// fmt.Println("headerAuth:", headerAuth)
+		fmt.Println("headerAuth:", headerAuth)
 		if headerAuth == "" {
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, utils.Response{	// abort buat menghentikan eksekusi middleware selanjutnya
 				Success: false,

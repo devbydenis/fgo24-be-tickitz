@@ -358,46 +358,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/verify-otp": {
-            "post": {
-                "description": "Verify otp",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "auth"
-                ],
-                "summary": "Handle verify otp",
-                "parameters": [
-                    {
-                        "description": "request verify otp",
-                        "name": "user",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.VerifyOTP"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Response"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request",
-                        "schema": {
-                            "$ref": "#/definitions/utils.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/movies/now-showing": {
             "get": {
                 "description": "Get now showing movies",
@@ -676,14 +636,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "username": {
-                    "type": "string"
-                }
-            }
-        },
-        "dto.VerifyOTP": {
-            "type": "object",
-            "properties": {
-                "otp": {
                     "type": "string"
                 }
             }

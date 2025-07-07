@@ -1,10 +1,12 @@
 package models
 
 import (
+	"backend-cinemax/config"
 	c "backend-cinemax/config"
-	u "backend-cinemax/utils"
 	"backend-cinemax/dto"
+	u "backend-cinemax/utils"
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -165,4 +167,26 @@ func UpdateUserPassword(email string, newPassword string) error {
 	)
 
 	return err
+}
+
+func VerifyOTP(reqOTP string) (bool, error) {
+	if reqOTP == "" {
+		return false, fmt.Errorf("OTP can't be empty")
+	}
+
+	redisClient := config.RedisConnect()
+	decoded, err := redisClient.Get(context.Background(), "users").Result()
+	if err != nil {
+		fmt.Println("failed to get otp cahce from redis:", err)
+		return false, err
+	}
+
+	otp := dto.OTPRequest{}
+	err = json.Unmarshal([]byte(decoded), &otp)
+
+	if reqOTP != otp.OTP {
+		return false, fmt.Errorf("cache otp and request otp doesnt match")
+	}
+
+	return true, nil
 }

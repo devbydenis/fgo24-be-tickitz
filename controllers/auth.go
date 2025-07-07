@@ -117,6 +117,10 @@ func LoginHandler(ctx *gin.Context) {
 		return
 	}
 
+	if req.Email == "admin@gmail.com" && req.Password == "admin123"{
+
+	}
+
 	if req.Email == "" {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,
@@ -209,6 +213,7 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 	if err != nil {
 		fmt.Println("failed to marshal json:", err)
 	}
+
 	redisClient.Set(
 		context.Background(), "users", 
 		string(encoded), 
@@ -228,54 +233,8 @@ func ForgotPasswordHandler(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, u.Response{
 		Success: true,
-		// Message: "OTP sent successfully. Please check your email",
 		Message: "OTP sent successfully. Input before 5 minutes",
 		OTP:     OTP,
-	})
-}
-
-// @summary Handle verify otp
-// @Description Verify otp
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param user body dto.VerifyOTP true "request verify otp"
-// @Success 200 {object} u.Response{Success bool, Message string, Errors any}
-// @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
-// @Security Token
-// @Router /auth/verify-otp [post]
-func VerifyOTPHandler(ctx *gin.Context) {
-	var req dto.VerifyOTP
-	ctx.ShouldBind(&req)
-
-	if req.OTP == "" {
-		ctx.JSON(http.StatusBadRequest, u.Response{
-			Success: false,
-			Message: "OTP is required",
-		})
-		return
-	}
-
-	redisClient := config.RedisConnect()
-	decoded, err := redisClient.Get(context.Background(), "users").Result()
-	if err != nil {
-		fmt.Println("failed to get value from redis:", err)
-	}
-
-	otp := dto.OTPRequest{}
-	err = json.Unmarshal([]byte(decoded), &otp)
-
-	if req.OTP != otp.OTP {
-		ctx.JSON(http.StatusBadRequest, u.Response{
-			Success: false,
-			Message: "Invalid OTP",
-		})
-		return
-	}
-
-	ctx.JSON(http.StatusAccepted, u.Response{
-		Success: true,
-		Message: "OTP verified successfully",
 	})
 }
 
@@ -288,11 +247,9 @@ func VerifyOTPHandler(ctx *gin.Context) {
 // @Success 200 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 400 {object} u.Response{Success bool, Message string, Errors any}
 // @Failure 404 {object} u.Response{Success bool, Message string, Errors any}
-// @Security Token
 // @Router /auth/change-password [post]
 func ChangePasswordHandler(ctx *gin.Context) {
 	var req dto.ChangePasswordRequest
-	fmt.Println("req:", req)
 	ctx.ShouldBind(&req)
 
 	if req.NewPassword == "" {
@@ -322,6 +279,7 @@ func ChangePasswordHandler(ctx *gin.Context) {
 	if req.NewPassword != req.ConfirmNewPassword {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,
+			Status:  http.StatusBadRequest,
 			Message: "New password and confirm new password do not match",
 		})
 		return
@@ -330,17 +288,49 @@ func ChangePasswordHandler(ctx *gin.Context) {
 	if !m.IsEmailExist(req.Email) {
 		ctx.JSON(http.StatusNotFound, u.Response{
 			Success: false,
+			Status:  http.StatusNotFound,
 			Message: "Email not found",
 		})
 		return
 	}
 
-	// fmt.Println("req email controller", req.Email, req.NewPassword)
-
-	err := m.UpdateUserPassword(req.Email, req.NewPassword)
+	// check validation otp 
+	isOTPValid, err := m.VerifyOTP(req.OTP)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, u.Response{
 			Success: false,
+			Status:  http.StatusInternalServerError,
+			Message: "Internal Server Error",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	if !isOTPValid {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Success: false,
+			Message: "Invalid OTP",
+		})
+		return
+	}
+
+	// hash password before update
+	HashedPassword, err := u.HashPassword(req.NewPassword)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, u.Response{
+			Success: false,
+			Status:  http.StatusInternalServerError,
+			Message: "Internal Server Error",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	err = m.UpdateUserPassword(req.Email, HashedPassword)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, u.Response{
+			Success: false,
+			Status:  http.StatusInternalServerError,
 			Message: "Internal Server Error",
 			Errors:  err.Error(),
 		})
@@ -352,17 +342,3 @@ func ChangePasswordHandler(ctx *gin.Context) {
 		Message: "Password reset successfully",
 	})
 }
-
-// feat(auth): add change password and verify OTP endpoints with corresponding DTOs and Swagger documentation
-
-// fix(auth): update references from models to dto for request structures in Swagger
-
-// chore(deps): update JWT library to v5 and add Redis dependency
-
-// feat(profile): implement GetProfileHandler and associated DTOs for user profile retrieval
-
-// feat(middleware): add AuthMiddleware for token verification in protected routes
-
-// refactor(utils): improve email sending logic and response structure
-
-// docs: update Swagger documentation for new endpoints and security definitions

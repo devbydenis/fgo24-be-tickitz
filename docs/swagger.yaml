@@ -87,11 +87,6 @@ definitions:
       username:
         type: string
     type: object
-  dto.VerifyOTP:
-    properties:
-      otp:
-        type: string
-    type: object
   utils.Response:
     properties:
       errors:
@@ -338,32 +333,6 @@ paths:
           schema:
             $ref: '#/definitions/utils.Response'
       summary: Handle register user
-      tags:
-      - auth
-  /auth/verify-otp:
-    post:
-      consumes:
-      - application/json
-      description: Verify otp
-      parameters:
-      - description: request verify otp
-        in: body
-        name: user
-        required: true
-        schema:
-          $ref: '#/definitions/dto.VerifyOTP'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utils.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.Response'
-      summary: Handle verify otp
       tags:
       - auth
   /movies/now-showing:
