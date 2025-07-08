@@ -20,7 +20,7 @@ erDiagram
     showtimes ||--o{ bookings : "has"
     seats ||--o{ bookings_seats : "reserved"
     bookings_seats ||--o{ bookings : "reserved"
-    payments ||--o{ bookings : "processes"
+    payments ||--o{ payments_transactions : "processes"
     bookings ||--o{ payments_transactions : "create"
 
     cities ||--o{ cinemas : "has"
@@ -191,12 +191,9 @@ erDiagram
     payments_transactions {
         int      id                 PK
         int      booking_id         FK
-        int      payment_id         FK
-        string   transaction_id
-        string   gateway_response 
+        int      payment_id         FK 
         enum     status             "pending,success,failed,refunded"
         decimal  amount
-        string   failure_reason
         datetime completed_at
         datetime created_at
     }

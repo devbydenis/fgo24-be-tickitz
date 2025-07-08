@@ -27,3 +27,5 @@ migration_status:
 
 migration_force:
 		$(MIGRATE) force $(version)
+
+NEWMIGRATE=migrate -path ./db/migrations -database "postgres://postgres:1@localhost:5454/cinemax?sslmode=disable" up 1
