@@ -6,9 +6,9 @@ definitions:
         type: string
       email:
         type: string
-      id:
-        type: string
       new_password:
+        type: string
+      otp:
         type: string
     type: object
   dto.ForgotPasswordRequest:
@@ -340,6 +340,23 @@ paths:
       consumes:
       - application/json
       description: Get now showing movies
+      parameters:
+      - description: Limit
+        in: query
+        name: limit
+        type: string
+      - description: Page
+        in: query
+        name: page
+        type: string
+      - description: Sort by
+        in: query
+        name: sort_by
+        type: string
+      - description: Search
+        in: query
+        name: search
+        type: string
       produces:
       - application/json
       responses:
@@ -351,7 +368,7 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/utils.Response'
-      summary: Get now showing movies
+      summary: Get now showing movies with limit, page, sort_by, search
       tags:
       - movies
   /movies/up-coming:

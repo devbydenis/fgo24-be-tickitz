@@ -4,6 +4,7 @@ import (
 	"backend-cinemax/config"
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -19,10 +20,9 @@ type Director struct {
 }
 
 type Cast struct {
-	ID        int    `json:"id" db:"id"`
-	ActorName string `json:"actor_name" db:"actor_name"`
+	ID            int    `json:"id" db:"id"`
+	ActorName     string `json:"actor_name" db:"actor_name"`
 	CharacterName string `json:"character_name" db:"character_name"`
-
 }
 
 type Movies struct {
@@ -32,7 +32,7 @@ type Movies struct {
 	Description string  `json:"description"`
 	Popularity  float32 `json:"popularity"`
 	Duration    int     `json:"duration"`
-	ReleaseDate string  `json:"release_date"`
+	ReleaseDate time.Time  `json:"release_date"`
 	Rating      float32 `json:"rating"`
 	PosterImg   string  `json:"poster_img"`
 	Status      string  `json:"status"` // "now playing", "coming soon", "ended"
@@ -55,36 +55,107 @@ type NowShowingMoviesResponse struct {
 	Movies []Movies `json:"movies"`
 }
 
-func NowShowingMovies() ([]Movies, error) {	// req masih belum dipake
-	// conncect to db
+func NowShowingMovies(sortBy, search string, page, limit int) ([]Movies, error) {
 	conn, err := config.DBConnect()
 	if err != nil {
 		fmt.Println("NowShowingMovies error connect to db:", err)
 		return []Movies{}, err
 	}
 
-	// jangan lupa tutup kalo udah selesai
 	defer func() {
 		conn.Conn().Close(context.Background())
 	}()
 
+	fmt.Println("sortBy:", sortBy, "search:", search, "page:", page, "limit:", limit)
+
+	if page == 0 {
+		page = 1
+	}
+
+	// Whitelist untuk kolom yang boleh di-sort
+	validSortColumns := map[string]bool{
+		"popularity":   true,
+		"release_date": true,
+		"rating":       true,
+		"title":        true,
+	}
+
+	if !validSortColumns[sortBy] {
+		sortBy = "popularity"
+	}
+
+	// Query dengan OR condition untuk handle empty search
+	query := fmt.Sprintf(`
+		SELECT 
+			id, 
+			title, 
+			description, 
+			popularity, 
+			status, 
+			duration, 
+			release_date, 
+			rating, 
+			poster_img, 
+			backdrop_img, 
+			language 
+		FROM movies 
+		WHERE status = 'now playing'
+			AND ($1 = '' OR title ILIKE $1)
+		ORDER BY %s DESC
+		LIMIT $2
+		OFFSET $3
+	`, sortBy)
+
+	// Format search parameter
+	searchParam := ""
+	if search != "" {
+		searchParam = "%" + search + "%"
+	}
+
 	rows, err := conn.Query(
 		context.Background(),
-		`
-			SELECT * FROM movies WHERE status = 'now playing'
-		`,
+		query,
+		searchParam,
+		limit,
+		(page-1)*limit,
 	)
 	if err != nil {
 		fmt.Println("NowShowingMovies error query:", err)
 		return []Movies{}, err
 	}
 
-	// collect row and map to struct
-	// pgx.CollectRows is used to collect rows from the query result into a slice
 	movies, err := pgx.CollectRows[Movies](rows, pgx.RowToStructByName)
 	if err != nil {
 		fmt.Println("NowShowingMovies error collect row:", err)
 		return []Movies{}, err
 	}
+
+	return movies, nil
+}
+
+
+func UpComingMovies() ([]Movies, error) {
+	conn, err := config.DBConnect()
+	if err != nil {
+		fmt.Println("UpComingMovies error connect to db:", err)
+		return []Movies{}, err
+	}
+	defer conn.Conn().Close(context.Background())
+
+	query := `SELECT id, title, description, popularity, status, duration, release_date, rating, poster_img, backdrop_img, language FROM movies WHERE status = 'coming soon'`
+
+	rows, err := conn.Query(
+		context.Background(), query)
+	if err != nil {
+		fmt.Println("UpComingMovies error query:", err)
+		return []Movies{}, err
+	}
+
+	movies, err := pgx.CollectRows[Movies](rows, pgx.RowToStructByName)
+	if err != nil {
+		fmt.Println("UpComingMovies error collect row:", err)
+		return []Movies{}, err
+	}
+
 	return movies, nil
 }

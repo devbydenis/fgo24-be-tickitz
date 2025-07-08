@@ -370,7 +370,33 @@ const docTemplate = `{
                 "tags": [
                     "movies"
                 ],
-                "summary": "Get now showing movies",
+                "summary": "Get now showing movies with limit, page, sort_by, search",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Limit",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by",
+                        "name": "sort_by",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -516,10 +542,10 @@ const docTemplate = `{
                 "email": {
                     "type": "string"
                 },
-                "id": {
+                "new_password": {
                     "type": "string"
                 },
-                "new_password": {
+                "otp": {
                     "type": "string"
                 }
             }

@@ -7,6 +7,6 @@ import (
 )
 
 func movieRouters(r *gin.RouterGroup) {
-	r.GET("/now-showing", c.GetNowShowingMoviesHandler) // Endpoint to get now showing movies
-	r.GET("/now-playing", c.GetNowShowingMoviesHandler) // Endpoint to get now playing movies
+	r.GET("/now-showing", c.GetNowShowingMoviesHandler)
+	r.GET("/up-coming", c.GetUpComingMoviesHandler)
 }
