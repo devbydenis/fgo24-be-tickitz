@@ -96,3 +96,32 @@ func UpdateUser(userId string, req dto.UpdateProfileRequest) error {
 
 	return err
 }
+
+func UploadPhoto(userId, fileName string) error {
+	// conncect to db
+	conn, err := config.DBConnect()
+	if err != nil {
+		return err
+	}
+	defer func(){
+		conn.Conn().Close(context.Background())
+	}()
+	
+	fmt.Println(fileName)
+
+	// set default value if request is empty
+	query := `
+		UPDATE profiles 
+		SET profile_picture = $1 
+		WHERE user_id = $2;
+		`
+
+	_, err = conn.Exec(
+			context.Background(), 
+			query, 
+			fileName, 
+			userId,
+	)
+
+	return err
+}
