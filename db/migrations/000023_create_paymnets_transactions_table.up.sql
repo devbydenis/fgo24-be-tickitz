@@ -7,7 +7,7 @@ CREATE TABLE payments_transactions(
   status payment_status DEFAULT 'pending',
   amount DECIMAL(10,2),
   completed_at TIMESTAMP,
-  created_at TIMESTAMP DEFAULT now(),
+  created_at TIMESTAMP DEFAULT now()
 );
 
 CREATE INDEX idx_payments_transactions_payment_id ON payments_transactions(payment_id);
