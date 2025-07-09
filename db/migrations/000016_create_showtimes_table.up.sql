@@ -9,5 +9,3 @@ CREATE TABLE showtimes(
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now()
 );
-
-CREATE INDEX idx_showtimes_show_time ON showtimes(show_time);

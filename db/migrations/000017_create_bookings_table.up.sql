@@ -1,5 +1,3 @@
-CREATE TYPE booking_status AS ENUM ('pending', 'confirmed', 'cancelled');
-
 CREATE TABLE bookings(
   id SERIAL PRIMARY KEY,
   user_id UUID REFERENCES users(id),
@@ -13,5 +11,3 @@ CREATE TABLE bookings(
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now()
 );
-
-CREATE INDEX idx_bookings_showtime_id ON bookings(showtime_id);

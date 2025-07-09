@@ -1,7 +1,6 @@
 CREATE TABLE casts (
     id SERIAL PRIMARY KEY,
     actor_name VARCHAR(100) NOT NULL,
-    character_name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -9,5 +8,6 @@ CREATE TABLE casts (
 CREATE TABLE movies_casts (
     id SERIAL PRIMARY KEY,
     movie_id INT REFERENCES movies(id) ON DELETE CASCADE,
-    cast_id INT REFERENCES casts(id) ON DELETE CASCADE
+    cast_id INT REFERENCES casts(id) ON DELETE CASCADE,
+    character_name VARCHAR(100) NOT NULL
 );

@@ -6,5 +6,4 @@ CREATE TABLE payments(
   is_active BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now()
-)
-
+);

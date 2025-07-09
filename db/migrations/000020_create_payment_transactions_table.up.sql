@@ -1,5 +1,3 @@
-CREATE TYPE payment_status AS ENUM ('pending', 'success', 'failed', 'refunded');
-
 CREATE TABLE payments_transactions(
   id SERIAL PRIMARY KEY,
   payment_id INT REFERENCES payments(id),
@@ -9,5 +7,3 @@ CREATE TABLE payments_transactions(
   completed_at TIMESTAMP,
   created_at TIMESTAMP DEFAULT now()
 );
-
-CREATE INDEX idx_payments_transactions_payment_id ON payments_transactions(payment_id);

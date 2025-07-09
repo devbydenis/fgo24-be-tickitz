@@ -7,5 +7,3 @@ CREATE TABLE seats(
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now()
 );
-
-CREATE INDEX idx_seats_seat_number ON seats(seat_number);

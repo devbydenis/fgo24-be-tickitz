@@ -1,2 +1,0 @@
-ALTER TABLE profiles
-ALTER COLUMN username SET NOT NULL;

@@ -7,5 +7,3 @@ CREATE TABLE cinemas(
   created_at TIMESTAMP DEFAULT now(),
   updated_at TIMESTAMP DEFAULT now()
 );
-
-CREATE INDEX idx_cinemas_name ON cinemas(name);
