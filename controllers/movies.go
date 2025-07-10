@@ -3,6 +3,7 @@ package controllers
 import (
 	m "backend-cinemax/models"
 	u "backend-cinemax/utils"
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -38,7 +39,7 @@ func GetNowShowingMoviesHandler(ctx *gin.Context) {
 	}
 
 
-	movies, err := m.NowShowingMovies(sortBy, search, page, limit)
+	movies, err := m.GetNowShowingMovies(sortBy, search, page, limit)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, u.Response{
 			Status:  http.StatusInternalServerError,
@@ -85,7 +86,7 @@ func GetUpComingMoviesHandler(ctx *gin.Context) {
 		return
 	}
 
-	movies, err := m.UpComingMovies()
+	movies, err := m.GetUpComingMovies()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, u.Response{
 			Status:  http.StatusInternalServerError,
@@ -106,5 +107,45 @@ func GetUpComingMoviesHandler(ctx *gin.Context) {
 		// 	Total:  len(movies),
 		// 	Movies: movies,
 		// },
+	})
+}
+
+// @summary Get movie detail
+// @description Get movie detail
+// @tags movies
+// @accept json
+// @produce json	
+// @param id path string true "Movie ID"
+// @success 200 {object} u.Response
+// @failure 400 {object} u.Response
+// @router /movies/{id} [get]
+func GetMovieDetailHandler(ctx *gin.Context) {
+	param := ctx.Param("id")
+	
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, u.Response{
+			Status:  http.StatusBadRequest,
+			Message: "Invalid request parameters",
+		})
+		return
+	}
+	fmt.Println(id)
+	
+	movie, err := m.GetMovieDetail(id)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, u.Response{
+			Status:  http.StatusInternalServerError,
+			Message: "Failed to retrieve movie detail",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, u.Response{
+		Status:  http.StatusOK,
+		Success: true,
+		Message: "Movie retrieved successfully",
+		Result: movie,
 	})
 }

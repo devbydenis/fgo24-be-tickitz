@@ -3,6 +3,7 @@ package models
 import (
 	"backend-cinemax/config"
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -26,17 +27,17 @@ type Cast struct {
 }
 
 type Movies struct {
-	ID          int     `json:"id"`
-	BackdropImg string  `json:"backdrop_img"`
-	Title       string  `json:"title"`
-	Description string  `json:"description"`
-	Popularity  float32 `json:"popularity"`
-	Duration    int     `json:"duration"`
-	ReleaseDate time.Time  `json:"release_date"`
-	Rating      float32 `json:"rating"`
-	PosterImg   string  `json:"poster_img"`
-	Status      string  `json:"status"` // "now playing", "coming soon", "ended"
-	Language    string  `json:"language"`
+	ID          int       `json:"id"`
+	BackdropImg string    `json:"backdrop_img"`
+	Title       string    `json:"title"`
+	Description string    `json:"description"`
+	Popularity  float32   `json:"popularity"`
+	Duration    int       `json:"duration"`
+	ReleaseDate time.Time `json:"release_date"`
+	Rating      float32   `json:"rating"`
+	PosterImg   string    `json:"poster_img"`
+	Status      string    `json:"status"` // "now playing", "coming soon", "ended"
+	Language    string    `json:"language"`
 	// CreatedAt   string  `json:"created_at"`
 	// UpdatedAt   string  `json:"updated_at"`
 }
@@ -55,7 +56,20 @@ type NowShowingMoviesResponse struct {
 	Movies []Movies `json:"movies"`
 }
 
-func NowShowingMovies(sortBy, search string, page, limit int) ([]Movies, error) {
+type MovieDetail struct {
+	ID          int        `json:"id"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Duration    int        `json:"duration"`
+	ReleaseDate time.Time  `json:"release_date"`
+	BackdropImg string     `json:"backdrop_img"`
+	PosterImg   string     `json:"poster_img"`
+	Genres      []Genre    `json:"genres"`
+	Directors   []Director `json:"directors"`
+	Casts       []Cast     `json:"casts"`
+}
+
+func GetNowShowingMovies(sortBy, search string, page, limit int) ([]Movies, error) {
 	conn, err := config.DBConnect()
 	if err != nil {
 		fmt.Println("NowShowingMovies error connect to db:", err)
@@ -133,8 +147,7 @@ func NowShowingMovies(sortBy, search string, page, limit int) ([]Movies, error) 
 	return movies, nil
 }
 
-
-func UpComingMovies() ([]Movies, error) {
+func GetUpComingMovies() ([]Movies, error) {
 	conn, err := config.DBConnect()
 	if err != nil {
 		fmt.Println("UpComingMovies error connect to db:", err)
@@ -158,4 +171,59 @@ func UpComingMovies() ([]Movies, error) {
 	}
 
 	return movies, nil
+}
+
+func GetMovieDetail(id int) (MovieDetail, error) {
+	conn, err := config.DBConnect()
+	if err != nil {
+		fmt.Println("DetailMovies error connect to db:", err)
+		return MovieDetail{}, err
+	}
+	defer conn.Conn().Close(context.Background())
+
+	query := `
+    SELECT 
+        m.id, m.title, m.description, m.duration,
+        m.release_date, m.backdrop_img, m.poster_img,
+        (
+            SELECT json_agg(json_build_object('id', g.id, 'name', g.name))
+            FROM genres g
+            JOIN movies_genres mg ON g.id = mg.genre_id
+            WHERE mg.movie_id = m.id
+        ) AS genres,
+        (
+            SELECT json_agg(json_build_object('id', d.id, 'name', d.name))
+            FROM directors d
+            JOIN movies_directors md ON d.id = md.director_id
+            WHERE md.movie_id = m.id
+        ) AS directors,
+        (
+            SELECT json_agg(json_build_object(
+                'id', c.id,
+                'actor_name', c.actor_name,
+                'character_name', mc.character_name
+            ))
+            FROM casts c
+            JOIN movies_casts mc ON c.id = mc.cast_id
+            WHERE mc.movie_id = m.id
+        ) AS casts
+    FROM movies m
+    WHERE m.id = $1
+`
+
+	var movie MovieDetail
+	var genresJSON, directorsJSON, castsJSON []byte
+
+	err = conn.QueryRow(context.Background(), query, id).Scan(
+		&movie.ID, &movie.Title, &movie.Description, &movie.Duration,
+		&movie.ReleaseDate, &movie.BackdropImg, &movie.PosterImg,
+		&genresJSON, &directorsJSON, &castsJSON,
+	)
+
+	// Unmarshal JSON ke struct
+	json.Unmarshal(genresJSON, &movie.Genres)
+	json.Unmarshal(directorsJSON, &movie.Directors)
+	json.Unmarshal(castsJSON, &movie.Casts)
+
+	return movie, nil
 }

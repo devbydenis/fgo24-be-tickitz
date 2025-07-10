@@ -442,6 +442,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/movies/{id}": {
+            "get": {
+                "description": "Get movie detail",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movies"
+                ],
+                "summary": "Get movie detail",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Movie ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/profile": {
             "get": {
                 "security": [
@@ -679,7 +717,7 @@ const docTemplate = `{
         "dto.RegisterRequest": {
             "type": "object",
             "properties": {
-                "confirm_password": {
+                "confirmPassword": {
                     "type": "string"
                 },
                 "email": {

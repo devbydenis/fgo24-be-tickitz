@@ -65,7 +65,7 @@ definitions:
     type: object
   dto.RegisterRequest:
     properties:
-      confirm_password:
+      confirmPassword:
         type: string
       email:
         type: string
@@ -335,6 +335,31 @@ paths:
       summary: Handle register user
       tags:
       - auth
+  /movies/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get movie detail
+      parameters:
+      - description: Movie ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get movie detail
+      tags:
+      - movies
   /movies/now-showing:
     get:
       consumes:

@@ -220,7 +220,7 @@ func GetAllMovieAdmin() ([]dto.MoviesResponse, error) {
 	query := `
 		SELECT
 				m.id,
-    		m.backdrop_img, 
+	  		m.backdrop_img, 
         m.title, 
         m.description, 
         m.popularity, 
