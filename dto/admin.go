@@ -8,17 +8,17 @@ type CastRequest struct {
 }
 
 type MoviesRequest struct {
-	ID          int     `json:"id"`
-	BackdropImg string     `json:"backdrop_img"`
-	Title       string     `json:"title"`
-	Description string     `json:"description"`
-	Popularity  float32    `json:"popularity"`
+	ID          *int     `json:"id"`
+	BackdropImg *string     `json:"backdrop_img"`
+	Title       *string     `json:"title"`
+	Description *string     `json:"description"`
+	Popularity  *float32    `json:"popularity"`
 	Duration    int        `json:"duration"`
-	ReleaseDate string     `json:"release_date"`
-	Rating      float32    `json:"rating"`
-	PosterImg   string     `json:"poster_img"`
-	Status      string     `json:"status"` // "now playing", "coming soon", "ended"
-	Language    string     `json:"language"`
+	ReleaseDate *string     `json:"release_date"`
+	Rating      *float32    `json:"rating"`
+	PosterImg   *string     `json:"poster_img"`
+	Status      *string     `json:"status"` // "now playing", "coming soon", "ended"
+	Language    *string     `json:"language"`
 	Genres      []string   `json:"genres"`
 	Casts       [][]string `json:"casts"`
 	Directors   string     `json:"directors"`

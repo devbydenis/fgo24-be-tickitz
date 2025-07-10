@@ -108,7 +108,7 @@ definitions:
 info:
   contact: {}
   description: This is a backend service for tickitz web app
-  title: fgo24-be-tickitz
+  title: Cinemax API
   version: "1.0"
 paths:
   /admin:

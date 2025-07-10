@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "description": "This is a backend service for tickitz web app",
-        "title": "fgo24-be-tickitz",
+        "title": "Cinemax API",
         "contact": {},
         "version": "1.0"
     },

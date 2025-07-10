@@ -7,7 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
+	// "strings"
 
 	"github.com/jackc/pgx/v5"
 )
@@ -315,85 +315,111 @@ func UpdateMovieAdmin(req dto.MoviesRequest) error {
 		conn.Conn().Close(context.Background())
 	}()
 
-	// update field yang hanya ada di request aja
-    query := "UPDATE movies SET "
-    params := []interface{}{}
-    paramCount := 1
+	// // update field yang hanya ada di request aja
+  //   query := "UPDATE movies SET "
+  //   params := []interface{}{}
+  //   paramCount := 1
     
-    if req.Title != "" {
-        query += fmt.Sprintf("title = $%d, ", paramCount)
-        params = append(params, req.Title)
-        paramCount++
-    }
+  //   if req.Title != "" {
+  //       query += fmt.Sprintf("title = $%d, ", paramCount)
+  //       params = append(params, req.Title)
+  //       paramCount++
+  //   }
     
-    if req.BackdropImg != "" {
-        query += fmt.Sprintf("backdrop_img = $%d, ", paramCount)
-        params = append(params, req.BackdropImg)
-        paramCount++
-    }
+  //   if req.BackdropImg != "" {
+  //       query += fmt.Sprintf("backdrop_img = $%d, ", paramCount)
+  //       params = append(params, req.BackdropImg)
+  //       paramCount++
+  //   }
 
-		if req.Description != "" {
-				query += fmt.Sprintf("description = $%d, ", paramCount)
-				params = append(params, req.Description)
-				paramCount++
-		}
+	// 	if req.Description != "" {
+	// 			query += fmt.Sprintf("description = $%d, ", paramCount)
+	// 			params = append(params, req.Description)
+	// 			paramCount++
+	// 	}
 
-		if req.PosterImg != "" {
-				query += fmt.Sprintf("poster_img = $%d, ", paramCount)
-				params = append(params, req.PosterImg)
-				paramCount++
-		}
+	// 	if req.PosterImg != "" {
+	// 			query += fmt.Sprintf("poster_img = $%d, ", paramCount)
+	// 			params = append(params, req.PosterImg)
+	// 			paramCount++
+	// 	}
 
-		if req.Duration != 0 {
-				query += fmt.Sprintf("duration = $%d, ", paramCount)
-				params = append(params, req.Duration)
-				paramCount++
-		}
+	// 	if req.Duration != 0 {
+	// 			query += fmt.Sprintf("duration = $%d, ", paramCount)
+	// 			params = append(params, req.Duration)
+	// 			paramCount++
+	// 	}
 
-		if req.Popularity != 0 {
-				query += fmt.Sprintf("popularity = $%d, ", paramCount)
-				params = append(params, req.Popularity)
-				paramCount++
-		}
+	// 	if req.Popularity != 0 {
+	// 			query += fmt.Sprintf("popularity = $%d, ", paramCount)
+	// 			params = append(params, req.Popularity)
+	// 			paramCount++
+	// 	}
 
-		if req.Rating != 0 {
-				query += fmt.Sprintf("rating = $%d, ", paramCount)
-				params = append(params, req.Rating)
-				paramCount++
-		}
+	// 	if req.Rating != 0 {
+	// 			query += fmt.Sprintf("rating = $%d, ", paramCount)
+	// 			params = append(params, req.Rating)
+	// 			paramCount++
+	// 	}
 
-		if req.Language != "" {
-				query += fmt.Sprintf("language = $%d, ", paramCount)
-				params = append(params, req.Language)
-				paramCount++
-		}
+	// 	if req.Language != "" {
+	// 			query += fmt.Sprintf("language = $%d, ", paramCount)
+	// 			params = append(params, req.Language)
+	// 			paramCount++
+	// 	}
 
-		if req.Status != "" {
-				query += fmt.Sprintf("status = $%d, ", paramCount)
-				params = append(params, req.Status)
-				paramCount++
-		}
+	// 	if req.Status != "" {
+	// 			query += fmt.Sprintf("status = $%d, ", paramCount)
+	// 			params = append(params, req.Status)
+	// 			paramCount++
+	// 	}
 
-		if req.ReleaseDate != "" {
-				query += fmt.Sprintf("release_date = $%d, ", paramCount)
-				params = append(params, req.ReleaseDate)
-				paramCount++
-		}
+	// 	if req.ReleaseDate != "" {
+	// 			query += fmt.Sprintf("release_date = $%d, ", paramCount)
+	// 			params = append(params, req.ReleaseDate)
+	// 			paramCount++
+	// 	}
 
-		// if req.Directors != "" {
-		// 		query += fmt.Sprintf("directors = $%d, ", paramCount)
-		// 		params = append(params, req.Directors)
-		// 		paramCount++
-		// }
+	// 	// if req.Directors != "" {
+	// 	// 		query += fmt.Sprintf("directors = $%d, ", paramCount)
+	// 	// 		params = append(params, req.Directors)
+	// 	// 		paramCount++
+	// 	// }
 
-		// Hapus koma terakhir
-    query = strings.TrimSuffix(query, ", ")
+	// 	// Hapus koma terakhir
+  //   query = strings.TrimSuffix(query, ", ")
     
-    // Tambahin WHERE clause
-    query += fmt.Sprintf(" WHERE id = $%d", paramCount)
-    params = append(params, req.ID)
+  //   // Tambahin WHERE clause
+  //   query += fmt.Sprintf(" WHERE id = $%d", paramCount)
+  //   params = append(params, req.ID)
     
-    _, err = conn.Exec(context.Background(), query, params...)
+		query := `
+				UPDATE movies 
+				SET title = COALESCE($1, title),
+						backdrop_img = COALESCE($2, backdrop_img),
+						description = COALESCE($3, description),
+						poster_img = COALESCE($4, poster_img),
+						duration = COALESCE($5, duration),
+						popularity = COALESCE($6, popularity),
+						rating = COALESCE($7, rating),
+						language = COALESCE($8, language),
+						status = COALESCE($9, status),
+						release_date = COALESCE($10, release_date)
+				WHERE id = $11
+		`
+
+    _, err = conn.Exec(context.Background(), query, 
+			req.Title, 
+			req.BackdropImg, 
+			req.Description, 
+			req.PosterImg, 
+			req.Duration, 
+			req.Popularity, 
+			req.Rating, 
+			req.Language, 
+			req.Status, 
+			req.ReleaseDate, 
+			req.ID)
 		if err != nil {
 				fmt.Println("UpdateMovieAdmin error exec row:", err)
 				return err

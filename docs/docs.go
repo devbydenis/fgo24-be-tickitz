@@ -757,7 +757,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "/",
 	Schemes:          []string{},
-	Title:            "fgo24-be-tickitz",
+	Title:            "Cinemax API",
 	Description:      "This is a backend service for tickitz web app",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

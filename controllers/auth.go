@@ -28,6 +28,7 @@ func RegisterHandler(ctx *gin.Context) {
 	var req dto.RegisterRequest
 
 	err := ctx.ShouldBind(&req)
+		fmt.Println("req", req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, u.Response{
 			Success: false,

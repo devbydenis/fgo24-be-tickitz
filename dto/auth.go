@@ -5,7 +5,7 @@ import "github.com/google/uuid"
 type RegisterRequest struct {
 	Email           string `json:"email" form:"email"`
 	Password        string `json:"password" form:"password"`
-	ConfirmPassword string `json:"confirm_password" form:"confirm_password"`
+	ConfirmPassword string `json:"confirmPassword" form:"confirmPassword"`
 }
 
 type LoginRequest struct {
