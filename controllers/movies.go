@@ -10,19 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @summary Get now showing movies with limit, page, sort_by, search
-// @description Get now showing movies
-// @tags movies
-// @accept json
-// @produce json
-// @param limit query string false "Limit"
-// @param page query string false "Page"
-// @param sort_by query string false "Sort by"
-// @param search query string false "Search"
-// @success 200 {object} u.Response
-// @failure 400 {object} u.Response
-// @router /movies/now-showing [get]
-func GetNowShowingMoviesHandler(ctx *gin.Context) {
+/* func GetNowShowingMoviesHandler(ctx *gin.Context) {
 	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
 	sortBy := ctx.DefaultQuery("sort_by", "title")
 	search := ctx.DefaultQuery("search", "")
@@ -40,6 +28,42 @@ func GetNowShowingMoviesHandler(ctx *gin.Context) {
 
 
 	movies, err := m.GetNowShowingMovies(sortBy, search, page, limit)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, u.Response{
+			Status:  http.StatusInternalServerError,
+			Message: "Failed to retrieve movies",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	if len(movies) == 0 {
+		ctx.JSON(http.StatusNotFound, u.Response{
+			Status:  http.StatusNotFound,
+			Message: "No movies found",
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, u.Response{
+		Status:  http.StatusOK,
+		Success: true,
+		Message: "Now showing movies retrieved successfully",
+		Result: movies,
+	})
+} */
+
+// @summary Get now showing movies with limit, page, sort_by, search
+// @description Get now showing movies
+// @tags movies
+// @accept json
+// @produce json
+// @success 200 {object} u.Response
+// @failure 400 {object} u.Response
+// @router /movies/now-showing [get]
+func GetNowShowingMoviesHandler(ctx *gin.Context) {
+
+	movies, err := m.GetNowShowingMovies()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, u.Response{
 			Status:  http.StatusInternalServerError,
@@ -147,5 +171,42 @@ func GetMovieDetailHandler(ctx *gin.Context) {
 		Success: true,
 		Message: "Movie retrieved successfully",
 		Result: movie,
+	})
+}
+
+func GetMoviesExploreHandler(ctx *gin.Context) {
+	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
+	sortBy := ctx.DefaultQuery("sortby", "title")
+	search := ctx.DefaultQuery("search", "")
+	if err != nil || limit <= 0 {
+        limit = 10
+    }
+
+	if limit > 50 {
+			limit = 50 // Batesin maksimal 50 item per page
+	}
+
+	page, err := strconv.Atoi(ctx.DefaultQuery("page", "1"))
+	if err != nil || page < 1 {
+			page = 1
+	}
+
+	fmt.Println("sortBy:", sortBy, "search:", search, "page:", page, "limit:", limit)
+
+	movies, err := m.GetMoviesExplore(search, sortBy, limit,page)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, u.Response{
+			Status:  http.StatusInternalServerError,
+			Message: "Failed to retrieve movies",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, u.Response{
+		Status:  http.StatusOK,
+		Success: true,
+		Message: "Now showing movies retrieved successfully",
+		Result: movies,
 	})
 }

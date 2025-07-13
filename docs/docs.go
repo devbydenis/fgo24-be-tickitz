@@ -358,6 +358,61 @@ const docTemplate = `{
                 }
             }
         },
+        "/movies/explore": {
+            "get": {
+                "description": "Get movies explore",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "movies"
+                ],
+                "summary": "Get movies explore",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Limit the number of movies returned",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by a specific column",
+                        "name": "sortby",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Search for a specific movie title",
+                        "name": "search",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/utils.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/movies/now-showing": {
             "get": {
                 "description": "Get now showing movies",
@@ -371,32 +426,6 @@ const docTemplate = `{
                     "movies"
                 ],
                 "summary": "Get now showing movies with limit, page, sort_by, search",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Limit",
-                        "name": "limit",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Page",
-                        "name": "page",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Sort by",
-                        "name": "sort_by",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "description": "Search",
-                        "name": "search",
-                        "in": "query"
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",

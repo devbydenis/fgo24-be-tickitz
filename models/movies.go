@@ -2,6 +2,7 @@ package models
 
 import (
 	"backend-cinemax/config"
+	"backend-cinemax/dto"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -69,7 +70,7 @@ type MovieDetail struct {
 	Casts       []Cast     `json:"casts"`
 }
 
-func GetNowShowingMovies(sortBy, search string, page, limit int) ([]Movies, error) {
+/*func GetNowShowingMovies(sortBy, search string, page, limit int) ([]Movies, error) {
 	conn, err := config.DBConnect()
 	if err != nil {
 		fmt.Println("NowShowingMovies error connect to db:", err)
@@ -146,6 +147,103 @@ func GetNowShowingMovies(sortBy, search string, page, limit int) ([]Movies, erro
 
 	return movies, nil
 }
+*/
+
+func GetNowShowingMovies() ([]dto.MoviesResponse, error) {
+	conn, err := config.DBConnect()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		conn.Conn().Close(context.Background())
+	}()
+
+	query := `
+		SELECT
+				m.id,
+	  		m.backdrop_img, 
+        m.title, 
+        m.description, 
+        m.popularity, 
+        m.duration,
+				m.release_date, 
+        m.rating, 
+        m.poster_img, 
+        m.status, 
+        m.language,
+				(
+					SELECT json_agg(g.name)
+					FROM genres g
+					JOIN movies_genres mg ON g.id = mg.genre_id
+					WHERE mg.movie_id = m.id
+				) AS genres,
+				(
+					SELECT json_agg(json_build_array(c.actor_name, mc.character_name))
+					FROM movies_casts mc
+					JOIN casts c ON mc.cast_id = c.id
+					WHERE mc.movie_id = m.id
+					GROUP BY mc.movie_id
+				) AS casts,
+        d.name AS director,
+				m.created_at,
+				m.updated_at
+	FROM movies m
+	JOIN movies_genres mg 
+    ON m.id = mg.movie_id
+	JOIN genres g 
+    ON mg.genre_id = g.id
+	JOIN movies_casts mc 
+    ON m.id = mc.movie_id
+	JOIN casts c 
+    ON mc.cast_id = c.id
+	JOIN movies_directors md 
+    ON m.id = md.movie_id
+	JOIN directors d 
+    ON md.director_id = d.id
+	WHERE m.status = 'now playing'
+	GROUP BY m.id, d.name
+	ORDER BY m.id
+	LIMIT 50
+	`
+
+	rows, err := conn.Query(context.Background(), query)
+	if err != nil {
+		fmt.Println("GetAllMovieAdmins error query rows:", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movies []dto.MoviesResponse
+
+	for rows.Next() {
+		var movie dto.MoviesResponse
+		err = rows.Scan(
+			&movie.ID,
+			&movie.BackdropImg,
+			&movie.Title,
+			&movie.Description,
+			&movie.Popularity,
+			&movie.Duration,
+			&movie.ReleaseDate,
+			&movie.Rating,
+			&movie.PosterImg,
+			&movie.Status,
+			&movie.Language,
+			&movie.Genres,
+			&movie.Casts,
+			&movie.Directors,
+			&movie.CreatedAt,
+			&movie.UpdatedAt,
+		)
+		if err != nil {
+			fmt.Println("GetAllMovieAdmins error scan row:", err)
+			return nil, err
+		}
+		movies = append(movies, movie)
+	}
+
+	return movies, nil
+}
 
 func GetUpComingMovies() ([]Movies, error) {
 	conn, err := config.DBConnect()
@@ -179,7 +277,7 @@ func GetMovieDetail(id int) (MovieDetail, error) {
 		fmt.Println("DetailMovies error connect to db:", err)
 		return MovieDetail{}, err
 	}
-	defer conn.Conn().Close(context.Background())
+	defer conn.Conn().Close(context.Background())	
 
 	query := `
     SELECT 
@@ -215,9 +313,9 @@ func GetMovieDetail(id int) (MovieDetail, error) {
 	var genresJSON, directorsJSON, castsJSON []byte
 
 	err = conn.QueryRow(context.Background(), query, id).Scan(
-		&movie.ID, &movie.Title, &movie.Description, &movie.Duration,
-		&movie.ReleaseDate, &movie.BackdropImg, &movie.PosterImg,
-		&genresJSON, &directorsJSON, &castsJSON,
+			&movie.ID, &movie.Title, &movie.Description, &movie.Duration,
+			&movie.ReleaseDate, &movie.BackdropImg, &movie.PosterImg,
+			&genresJSON, &directorsJSON, &castsJSON,
 	)
 
 	// Unmarshal JSON ke struct
@@ -226,4 +324,122 @@ func GetMovieDetail(id int) (MovieDetail, error) {
 	json.Unmarshal(castsJSON, &movie.Casts)
 
 	return movie, nil
+}
+
+func GetMoviesExplore(search, sortBy string, limit, page int) ([]dto.MoviesResponse, error) {
+	conn, err := config.DBConnect()
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		conn.Conn().Close(context.Background())
+	}()
+
+	fmt.Println("sortBy:", sortBy, "search:", search, "page:", page, "limit:", limit)
+
+	if page == 0 {
+		page = 1
+	}
+
+	// Whitelist untuk kolom yang boleh di-sort
+	validSortColumns := map[string]bool{
+		"popularity":   true,
+		"release_date": true,
+		"rating":       true,
+		"title":        true,
+	}
+
+	if !validSortColumns[sortBy] {
+		sortBy = "popularity"
+	}
+
+	searchParam := "%" + search + "%"
+
+	query := fmt.Sprintf(`
+		SELECT
+				m.id,
+	  		m.backdrop_img, 
+        m.title, 
+        m.description, 
+        m.popularity, 
+        m.duration,
+				m.release_date, 
+        m.rating, 
+        m.poster_img, 
+        m.status, 
+        m.language,
+				(
+					SELECT json_agg(g.name)
+					FROM genres g
+					JOIN movies_genres mg ON g.id = mg.genre_id
+					WHERE mg.movie_id = m.id
+				) AS genres,
+				(
+					SELECT json_agg(json_build_array(c.actor_name, mc.character_name))
+					FROM movies_casts mc
+					JOIN casts c ON mc.cast_id = c.id
+					WHERE mc.movie_id = m.id
+					GROUP BY mc.movie_id
+				) AS casts,
+        d.name AS director,
+				m.created_at,
+				m.updated_at
+	FROM movies m
+	JOIN movies_genres mg 
+    ON m.id = mg.movie_id
+	JOIN genres g 
+    ON mg.genre_id = g.id
+	JOIN movies_casts mc 
+    ON m.id = mc.movie_id
+	JOIN casts c 
+    ON mc.cast_id = c.id
+	JOIN movies_directors md 
+    ON m.id = md.movie_id
+	JOIN directors d 
+    ON md.director_id = d.id
+	WHERE m.status = 'now playing'
+		AND ($1 = '' OR m.title ILIKE $1)
+	GROUP BY m.id, d.name
+	ORDER BY %s DESC
+	LIMIT $2
+	OFFSET $3;
+	`, sortBy)
+
+	rows, err := conn.Query(context.Background(), query, searchParam, limit, (page-1)*limit)
+	if err != nil {
+		fmt.Println("GetAllMovieAdmins error query rows:", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var movies []dto.MoviesResponse
+
+	for rows.Next() {
+		var movie dto.MoviesResponse
+		err = rows.Scan(
+			&movie.ID,
+			&movie.BackdropImg,
+			&movie.Title,
+			&movie.Description,
+			&movie.Popularity,
+			&movie.Duration,
+			&movie.ReleaseDate,
+			&movie.Rating,
+			&movie.PosterImg,
+			&movie.Status,
+			&movie.Language,
+			&movie.Genres,
+			&movie.Casts,
+			&movie.Directors,
+			&movie.CreatedAt,
+			&movie.UpdatedAt,
+		)
+		if err != nil {
+			fmt.Println("GetMoviesExplore error scan row:", err)
+			return nil, err
+		}
+		movies = append(movies, movie)
+	}
+
+	return movies, nil
 }

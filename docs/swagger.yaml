@@ -360,28 +360,47 @@ paths:
       summary: Get movie detail
       tags:
       - movies
+  /movies/explore:
+    get:
+      consumes:
+      - application/json
+      description: Get movies explore
+      parameters:
+      - description: Limit the number of movies returned
+        in: query
+        name: limit
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: string
+      - description: Sort by a specific column
+        in: query
+        name: sortby
+        type: string
+      - description: Search for a specific movie title
+        in: query
+        name: search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Get movies explore
+      tags:
+      - movies
   /movies/now-showing:
     get:
       consumes:
       - application/json
       description: Get now showing movies
-      parameters:
-      - description: Limit
-        in: query
-        name: limit
-        type: string
-      - description: Page
-        in: query
-        name: page
-        type: string
-      - description: Sort by
-        in: query
-        name: sort_by
-        type: string
-      - description: Search
-        in: query
-        name: search
-        type: string
       produces:
       - application/json
       responses:
