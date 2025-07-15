@@ -35,20 +35,20 @@ jobs:
       - name: Copy Migrations to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: 146.190.102.54
-          username: denis
-          port: 9803
-          key: ${{ secrets.VPS_PRIVATE_KEY }}
-          source: "migrations"
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          port: ${{ secrets.SSH_PORT }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "db/migrations"
           target: "/home/denis/deploy"
 
       - name: SSH Deploy to VPS
         uses: appleboy/ssh-action@v1.0.0
         with:
-          host: 146.190.102.54
-          username: denis
-          key: ${{ secrets.VPS_PRIVATE_KEY }}
-          port: 9803
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
           script: |
             cd /home/denis/deploy
 
