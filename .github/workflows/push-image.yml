@@ -59,7 +59,7 @@ jobs:
             docker compose pull
 
             echo "✅ Start DB & Redis"
-            docker compose up -d db redis
+            docker compose up -d postgres redis
 
             echo "⏳ Wait for Postgres"
             sleep 10
@@ -77,4 +77,3 @@ jobs:
             docker compose up -d app
 
             echo "✅ Deploy Complete"
-            
