@@ -77,3 +77,4 @@ jobs:
             docker compose up -d app
 
             echo "✅ Deploy Complete"
+            
