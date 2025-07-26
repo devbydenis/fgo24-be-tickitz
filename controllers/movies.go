@@ -174,6 +174,18 @@ func GetMovieDetailHandler(ctx *gin.Context) {
 	})
 }
 
+// @summary Get movies explore
+// @description Get movies explore
+// @tags movies
+// @accept json
+// @produce json
+// @param limit query string false "Limit the number of movies returned"
+// @param page query string false "Page number for pagination"
+// @param sortby query string false "Sort by a specific column"
+// @param search query string false "Search for a specific movie title"
+// @success 200 {object} u.Response
+// @failure 400 {object} u.Response
+// @router /movies/explore [get]
 func GetMoviesExploreHandler(ctx *gin.Context) {
 	limit, err := strconv.Atoi(ctx.DefaultQuery("limit", "10"))
 	sortBy := ctx.DefaultQuery("sortby", "title")

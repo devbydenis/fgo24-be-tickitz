@@ -14,6 +14,7 @@ func CombineRouters(r *gin.Engine) {
 	profileRouters(r.Group("/profile"))
 	movieRouters(r.Group("/movies"))
 	adminRouters(r.Group("/admin"))
+	transactionRouters(r.Group(("/transactions")))
 
 	// Swagger 
 	docs.SwaggerInfo.BasePath = "/"

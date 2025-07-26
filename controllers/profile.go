@@ -5,6 +5,7 @@ import (
 	"backend-cinemax/models"
 	"backend-cinemax/utils"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -115,6 +116,11 @@ func UpdateProfileHandler(ctx *gin.Context) {
 func UploadPhotoHandler(ctx *gin.Context) {
 	userId := ctx.MustGet("userId").(string)
 
+ 	// make sure direktori uploads ada
+    if _, err := os.Stat("./uploads"); os.IsNotExist(err) {
+        os.Mkdir("./uploads", 0755) // kalo ga ada buat folder uploads
+    }
+	
 	file, err := ctx.FormFile("photo")
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, utils.Response{
@@ -125,8 +131,7 @@ func UploadPhotoHandler(ctx *gin.Context) {
 		return
 	}
 
-	// agar supaya kalo ada yg upload dengan nama yang sama ga ke replace
-	// kita lakuin hal berikut
+	// agar supaya kalo ada yg upload dengan nama yang sama ga ke replace kita lakuin hal berikut
 	fileName := uuid.New().String()     // generate random string buat nama filenya
 	ext := filepath.Ext(file.Filename)  // ambil extention dari metada file.Filename
 

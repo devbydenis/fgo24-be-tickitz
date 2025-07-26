@@ -3,6 +3,7 @@ package controllers
 import (
 	"backend-cinemax/config"
 	"backend-cinemax/dto"
+	"backend-cinemax/models"
 	m "backend-cinemax/models"
 	u "backend-cinemax/utils"
 	"context"
@@ -160,7 +161,10 @@ func LoginHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, u.Response{
 		Success: true,
 		Message: "Login Success",
-		Token:   token,
+		Result: models.LoginResponse{
+			ID:    users[0].ID,
+			Token: token,
+		},
 	})
 }
 

@@ -306,8 +306,7 @@ func GetMovieDetail(id int) (MovieDetail, error) {
             WHERE mc.movie_id = m.id
         ) AS casts
     FROM movies m
-    WHERE m.id = $1
-`
+    WHERE m.id = $1`
 
 	var movie MovieDetail
 	var genresJSON, directorsJSON, castsJSON []byte
@@ -443,3 +442,4 @@ func GetMoviesExplore(search, sortBy string, limit, page int) ([]dto.MoviesRespo
 
 	return movies, nil
 }
+

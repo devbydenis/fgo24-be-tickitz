@@ -27,13 +27,15 @@ func main() {
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"http://localhost:5173"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
-    AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept"},
-    AllowCredentials: true,
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "Accept"},
+		AllowCredentials: true,
 	}))
 	
 	r.GET("/", func(c *gin.Context) {
 		c.String(200, "Hello, World!")
 	})
+
+	r.Static("/uploads", "./uploads")
 
 	routers.CombineRouters(r)
 	

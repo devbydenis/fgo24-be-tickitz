@@ -13,6 +13,11 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+type LoginResponse struct {
+	ID    uuid.UUID    `json:"id"`
+	Token string `json:"token"`
+}
+
 type IsEmailExistType struct {
 	Email string `json:"email"`
 }
