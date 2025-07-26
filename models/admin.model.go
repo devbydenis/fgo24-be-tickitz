@@ -47,6 +47,7 @@ func InsertToGenreTable(trx pgx.Tx, genres []string, movieId int64) error {
 	for _, genre := range genres {
 		// check each id genres input
 		var genreId int64
+		
 		err := trx.QueryRow(
 			context.Background(),
 			`SELECT id FROM genres WHERE name = $1`,
