@@ -34,10 +34,7 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
-
-      - name: Fix file permissions
-        run: chmod -R a+r migrations
-
+      
       - name: Copy Migrations to VPS
         uses: appleboy/scp-action@v0.1.4
         with:
@@ -66,7 +63,7 @@ jobs:
             docker compose up -d postgres redis
 
             echo "----- Wait for Postgres & Redis to start -----"
-            sleep 10
+            sleep 10\
 
             echo "----- Run migrations -----"
             docker run --rm \
@@ -74,7 +71,7 @@ jobs:
               -v "/home/denis/deploy/migrations:/migrations" \
               migrate/migrate \
               -path=/migrations \
-              -database "postgres://postgres:1@postgres:5432/cinemax?sslmode=disable" \
+              -database "postgres://postgres:1@postgres:5432/postgres?sslmode=disable" \
               up
 
             echo "✅ Start App"

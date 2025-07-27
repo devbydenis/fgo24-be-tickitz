@@ -1,0 +1,34 @@
+services:
+  app:
+    image: ghcr.io/devbydenis/fgo24-be-tickitz:latest
+    ports:
+      - "9803:8800"
+    env_file:
+      - .env
+    networks:
+      - netapp
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_PASSWORD=1
+    env_file:
+      - .env
+    volumes:
+      - data_postgres:/var/lib/postgresql/data
+    networks:
+      - netapp
+  redis:
+    image: redis
+    env_file:
+      - .env
+    networks:
+      - netapp
+  
+  cinemax:
+    image: ghcr.io/devbydenis/fe-cinemax:latest
+    ports:
+      - "9802:80"
+
+volumes:
+  data_postgres: {}
+  data_redis: {}docker compose exec db psql -U your_username -d your_database
