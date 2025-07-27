@@ -27,6 +27,9 @@ jobs:
     name: Deploy & Migrate
     needs: build-and-push
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout Code
