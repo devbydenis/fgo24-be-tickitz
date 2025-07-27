@@ -70,7 +70,7 @@ jobs:
               -v "/home/denis/deploy/migrations:/migrations" \
               migrate/migrate \
               -path=/db/migrations \
-              -database "postgres://postgres:1@db:5432/tikcitz?sslmode=disable" \
+              -database "postgres://postgres:1@postgres:5432/cinemax?sslmode=disable" \
               up
 
             echo "✅ Start App"
