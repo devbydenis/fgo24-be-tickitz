@@ -2,6 +2,8 @@
 
 ```mermaid
 
+
+
 erDiagram
     direction LR
 
@@ -14,19 +16,13 @@ erDiagram
     movies }|--|| movies_casts: "has"
     movies }|--|| movies_directors :  "has"
     movies_directors||--|{ directors: "has"
-    movies ||--o{ showtimes: "shown in"
 
-    bookings }o--||users : "makes"
-    showtimes ||--o{ bookings : "has"
-    seats ||--o{ bookings_seats : "reserved"
-    bookings_seats ||--o{ bookings : "reserved"
-    payments ||--o{ payments_transactions : "processes"
-    bookings ||--o{ payments_transactions : "create"
+    transactions }o--||users : "makes"
+    movies ||--o{ transactions : "has"
+    transactions ||--o{ transaction_detail : "has"
+    transactions ||--o{ transaction_history : "has"
+    payments ||--o{ transactions : "has"
 
-    cities ||--o{ cinemas : "has"
-    cinemas ||--o{ theaters : "has"
-    theaters ||--o{ seats : "contains"
-    theaters ||--o{ showtimes : "contains"
 
     users {
         int         id            PK
@@ -115,71 +111,29 @@ erDiagram
         datetime  created_at
         datetime  updated_at
     }
-
-    cities {
-        int       id          PK
-        string    name
-        string    province
-        datetime  created_at
-        datetime  updated_at
+    transactions {
+        int id  PK
+        int id_user FK
+        int id_cinema   FK
+        int id_payment_method   FK
+        int id_movie    FK
+        time    time_booking
+        date    date_booking
+        float   total_price
+        datetime    created_at
+        datetime    updated_at
     }
-
-    cinemas {
-        int       id          PK
-        int       city_id     FK
-        string    name
-        string    address
-        boolean   is_active
-        datetime  created_at
-        datetime  updated_at
+    transaction_detail{
+        int id  PK
+        int id_transaction  FK
+        string  seats
     }
-
-    theaters {
-        int     id          PK
-        int     cinema_id   FK
-        string  name
-        int     capacity
-        boolean is_active
+    transaction_history{
+        int     id  PK
+        int     id_transaction  FK
+        enum    status "pending, success, failed"
+        string  note
     }
-
-    showtimes {
-        int     id               PK
-        int     movie_id        FK
-        int     theater_id      FK
-        date    show_date
-        time    show_time
-        decimal base_price
-        int     available_seats
-    }
-
-    seats {
-        int     id          PK
-        int     theater_id  FK
-        string  seat_letter UK
-        int     seat_number UK
-        boolean is_active
-    }
-
-    bookings_seats {
-        int     id              PK
-        int     seat_id         FK
-        int     booking_id     FK
-        decimal seat_price
-    }
-
-    bookings {
-        int         id               PK
-        string      booking_code     UK
-        int         user_id          FK
-        int         showtime_id      FK
-        enum        status           "pending, success, failed"
-        decimal     total_amount
-        decimal     discount_amount
-        decimal     tax_amount
-        datetime    booking_time
-        datetime    expires_at
-    }
-
     payments {
         int     id              PK
         string  method_name
@@ -188,13 +142,6 @@ erDiagram
         boolean is_active
     }
 
-    payments_transactions {
-        int      id                 PK
-        int      booking_id         FK
-        int      payment_id         FK 
-        enum     status             "pending,success,failed,refunded"
-        decimal  amount
-        datetime completed_at
-        datetime created_at
-    }
+
+
 ```

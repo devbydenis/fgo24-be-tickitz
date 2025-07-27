@@ -69,7 +69,7 @@ jobs:
               --network deploy_netapp \
               -v "/home/denis/deploy/migrations:/migrations" \
               migrate/migrate \
-              -path=/migrations \
+              -path=/db/migrations \
               -database "postgres://postgres:1@db:5432/tikcitz?sslmode=disable" \
               up
 
