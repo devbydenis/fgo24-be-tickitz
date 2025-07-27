@@ -71,7 +71,7 @@ jobs:
               -v "/home/denis/deploy/migrations:/migrations" \
               migrate/migrate \
               -path=/migrations \
-              -database "postgres://postgres:1@postgres:5432/postgres?sslmode=disable" \
+              -database "postgres://postgres:1@postgres:5432/cineamax?sslmode=disable" \
               up
 
             echo "✅ Start App"

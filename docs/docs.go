@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/admin": {
             "post": {
+                "security": [
+                    {
+                        "Token": []
+                    }
+                ],
                 "description": "Create a new movie with all relations (genres, casts, directors)",
                 "consumes": [
                     "application/json"
@@ -63,6 +68,11 @@ const docTemplate = `{
         },
         "/admin/delete/{id}": {
             "delete": {
+                "security": [
+                    {
+                        "Token": []
+                    }
+                ],
                 "description": "Delete a movie admin by ID",
                 "consumes": [
                     "application/json"
@@ -107,6 +117,11 @@ const docTemplate = `{
         },
         "/admin/list": {
             "get": {
+                "security": [
+                    {
+                        "Token": []
+                    }
+                ],
                 "description": "List all movie admin",
                 "consumes": [
                     "application/json"
@@ -136,6 +151,11 @@ const docTemplate = `{
         },
         "/admin/update": {
             "patch": {
+                "security": [
+                    {
+                        "Token": []
+                    }
+                ],
                 "description": "Update a movie with all relations (genres, casts, directors)",
                 "consumes": [
                     "application/json"
@@ -148,6 +168,13 @@ const docTemplate = `{
                 ],
                 "summary": "Handle update movie with all relations",
                 "parameters": [
+                    {
+                        "type": "file",
+                        "description": "photo",
+                        "name": "photo",
+                        "in": "formData",
+                        "required": true
+                    },
                     {
                         "description": "request update movie",
                         "name": "movie",
@@ -706,7 +733,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "profile"
+                    "transactions"
                 ],
                 "summary": "Handle get history",
                 "responses": {

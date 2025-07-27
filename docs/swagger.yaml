@@ -163,6 +163,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
       summary: Handle create movie with all relations
       tags:
       - admin
@@ -192,6 +194,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
       summary: Handle delete movie admin
       tags:
       - admin
@@ -211,6 +215,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
       summary: Handle list all movie admin
       tags:
       - admin
@@ -220,6 +226,11 @@ paths:
       - application/json
       description: Update a movie with all relations (genres, casts, directors)
       parameters:
+      - description: photo
+        in: formData
+        name: photo
+        required: true
+        type: file
       - description: request update movie
         in: body
         name: movie
@@ -241,6 +252,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
       summary: Handle update movie with all relations
       tags:
       - admin
@@ -599,7 +612,7 @@ paths:
       - Token: []
       summary: Handle get history
       tags:
-      - profile
+      - transactions
 securityDefinitions:
   Token:
     description: |-
