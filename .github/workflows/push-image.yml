@@ -39,7 +39,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "db/migrations"
+          source: "/db/migrations"
           target: "/home/denis/deploy"
 
       - name: SSH Deploy to VPS
