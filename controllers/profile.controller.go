@@ -162,6 +162,16 @@ func UploadPhotoHandler(ctx *gin.Context) {
 	})
 }
 
+// @summary Handle get history
+// @Description Get history
+// @Tags profile
+// @Accept json
+// @Produce json
+// @Success 200 {object} utils.Response{Success bool, Message string}
+// @Failure 400 {object} utils.Response{Success bool, Message string, Errors any}
+// @Failure 500 {object} utils.Response{Success bool, Message string, Errors any}
+// @Security Token
+// @Router /profile/history [get]
 func GetHistoryHandler(ctx *gin.Context) {
 	userId := ctx.MustGet("userId").(string)
 	token := ctx.GetHeader("Authorization")

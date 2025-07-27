@@ -9,6 +9,16 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// @summary Handle create transaction
+// @Description Create a new transaction
+// @Tags transactions
+// @Accept json
+// @Produce json
+// @Param transaction body dto.CreateTransactionRequest true "request create transaction"
+// @Success 200 {object} utils.Response{Status int, Success bool, Message string}
+// @Failure 400 {object} utils.Response{Status int, Success bool, Message string, Result any}
+// @Failure 500 {object} utils.Response{Status int, Success bool, Message string, Result any}
+// @Router /transactions [post]
 func CreateTransactionHandler(ctx *gin.Context) {
 	var req dto.CreateTransactionRequest
 	token := ctx.GetHeader("Authorization")

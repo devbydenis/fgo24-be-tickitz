@@ -35,6 +35,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Fix file permissions
+        run: chmod -R a+r migrations
+
       - name: Copy Migrations to VPS
         uses: appleboy/scp-action@v0.1.4
         with:

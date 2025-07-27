@@ -11,6 +11,31 @@ definitions:
       otp:
         type: string
     type: object
+  dto.CreateTransactionRequest:
+    properties:
+      cinema_id:
+        type: integer
+      date_booking:
+        type: string
+      location:
+        type: string
+      movie_id:
+        type: integer
+      payment_methods_id:
+        type: integer
+      seats:
+        items:
+          type: string
+        type: array
+      status:
+        type: string
+      time_booking:
+        type: string
+      total_price:
+        type: integer
+      user_id:
+        type: string
+    type: object
   dto.ForgotPasswordRequest:
     properties:
       email:
@@ -520,6 +545,61 @@ paths:
       summary: Handle upload photo
       tags:
       - profile
+  /profile/history:
+    get:
+      consumes:
+      - application/json
+      description: Get history
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
+      summary: Handle get history
+      tags:
+      - profile
+  /transactions:
+    post:
+      consumes:
+      - application/json
+      description: Create a new transaction
+      parameters:
+      - description: request create transaction
+        in: body
+        name: transaction
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateTransactionRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      summary: Handle create transaction
+      tags:
+      - transactions
 securityDefinitions:
   Token:
     description: |-
