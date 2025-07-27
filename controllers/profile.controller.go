@@ -4,6 +4,7 @@ import (
 	"backend-cinemax/dto"
 	"backend-cinemax/models"
 	"backend-cinemax/utils"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -158,5 +159,38 @@ func UploadPhotoHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, utils.Response{
 		Success: true,
 		Message: "Photo uploaded successfully",
+	})
+}
+
+func GetHistoryHandler(ctx *gin.Context) {
+	userId := ctx.MustGet("userId").(string)
+	token := ctx.GetHeader("Authorization")
+
+	if token == "" {
+		ctx.JSON(http.StatusUnauthorized, utils.Response{
+			Success: false,
+			Message: "Unauthorized",
+		})
+		return
+	}
+
+	fmt.Println("user id:", userId)
+	fmt.Println("token:", token)
+
+	histories, err := models.GetHistory(userId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Success: false,
+			Message: "Internal Server Error",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+
+	ctx.JSON(http.StatusOK, utils.Response{
+		Success: true,
+		Message: "History retrieved successfully",
+		Result: histories,
 	})
 }

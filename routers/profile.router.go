@@ -8,7 +8,8 @@ import (
 )
 
 func profileRouters(r *gin.RouterGroup) {
-	r.GET("", m.AuthMiddleware(), c.GetProfileHandler) 
+	r.GET("", m.AuthMiddleware(), c.GetProfileHandler)
+	r.GET("/history", m.AuthMiddleware(), c.GetHistoryHandler)
 	r.PATCH("", m.AuthMiddleware(), c.UpdateProfileHandler)
 	r.POST("", m.AuthMiddleware(), c.UploadPhotoHandler)
 	// r.DELETE("/profile", c.DeleteProfileHandler)

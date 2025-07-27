@@ -416,3 +416,34 @@ INSERT INTO payments_transactions (payment_id, booking_id, status, amount, compl
 -- FROM showtimes s
 -- JOIN movies m ON s.movie_id = m.id
 -- ORDER BY s.show_date, s.show_time;
+
+
+
+SELECT * FROM transactions LIMIT 100;
+SELECT * FROM transaction_detail LIMIT 100;
+SELECT * FROM transaction_history LIMIT 100;
+
+SELECT 
+  t.id AS transaction_id,
+  t.user_id,
+  c.name AS cinema_name,
+  t.date_booking,
+  t.time_booking,
+  m.title AS movie_name,
+  (
+    SELECT json_agg(td.seat) AS seats
+    FROM transaction_detail td
+    JOIN transactions t ON td.transaction_id = t.id
+  ),
+  t.total_price,
+  th.status
+FROM 
+  transactions t
+JOIN transaction_detail td ON t.id = td.transaction_id
+JOIN transaction_history th ON t.id = th.transaction_id
+JOIN cinemas c ON t.cinema_id = c.id
+JOIN movies m ON t.movie_id = m.id
+WHERE 
+  t.user_id = '9955a0d4-0941-4bf3-8541-26e88827d25a'
+GROUP BY 
+  t.id, t.user_id, c.name, t.date_booking, t.time_booking, m.title, t.total_price, th.status;

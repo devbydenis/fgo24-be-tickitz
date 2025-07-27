@@ -125,3 +125,72 @@ func UploadPhoto(userId, fileName string) error {
 
 	return err
 }
+
+func GetHistory(userId string) ([]dto.GetHistoryResponse, error) {
+		// conncect to db
+	conn, err := config.DBConnect()
+	if err != nil {
+		return []dto.GetHistoryResponse{}, err
+	}
+	defer func(){
+		conn.Conn().Close(context.Background())
+	}()
+
+	query := `
+		SELECT 
+			t.id AS transaction_id,
+			c.name AS cinema_name,
+			t.date_booking,
+			t.time_booking,
+			m.title AS movie_name,
+			(
+				SELECT json_agg(td.seat) AS seats
+				FROM transaction_detail td
+				JOIN transactions t ON td.transaction_id = t.id
+			),
+			t.total_price,
+			th.status
+		FROM 
+			transactions t
+		JOIN transaction_detail td ON t.id = td.transaction_id
+		JOIN transaction_history th ON t.id = th.transaction_id
+		JOIN cinemas c ON t.cinema_id = c.id
+		JOIN movies m ON t.movie_id = m.id
+		WHERE 
+			t.user_id = $1
+		GROUP BY 
+			t.id, t.user_id, c.name, t.date_booking, t.time_booking, m.title, t.total_price, th.status;
+	`
+
+	rows, err := conn.Query(context.Background(), query, userId)
+	if err != nil {
+		fmt.Println("GetHistory error exec row:", err)
+		return []dto.GetHistoryResponse{}, err
+	}
+	defer rows.Close()
+
+	var histories []dto.GetHistoryResponse
+	for rows.Next() {
+		var history dto.GetHistoryResponse
+		err = rows.Scan(
+			&history.TransactionId,
+			&history.CinemaName,
+			&history.DateBooking,
+			&history.TimeBooking,
+			&history.MovieName,
+			&history.Seats,
+			&history.TotalPrice,
+			&history.Status,
+		)
+
+		if err != nil {
+			fmt.Println("GetHistory error scan row:", err)
+			return []dto.GetHistoryResponse{}, err
+		}
+		
+		histories = append(histories, history)
+		fmt.Println("GetHistory: ", histories)
+	}
+
+	return histories, nil
+}
