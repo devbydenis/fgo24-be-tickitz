@@ -9,4 +9,5 @@ import (
 
 func transactionRouters(r *gin.RouterGroup) {
 	r.POST("/create", m.AuthMiddleware(), c.CreateTransactionHandler)
+	r.GET("/history", m.AuthMiddleware(), c.GetHistoryHandler)
 }

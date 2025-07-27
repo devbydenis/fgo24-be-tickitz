@@ -3,6 +3,7 @@ package controllers
 import (
 	"backend-cinemax/dto"
 	"backend-cinemax/models"
+	"backend-cinemax/utils"
 	u "backend-cinemax/utils"
 	"net/http"
 
@@ -60,5 +61,47 @@ func CreateTransactionHandler(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, u.Response{
 		Status:  http.StatusOK,
 		Message: "Transaction Success",
+	})
+}
+
+
+
+// @summary Handle get history
+// @Description Get history
+// @Tags profile
+// @Accept json
+// @Produce json
+// @Success 200 {object} utils.Response{Success bool, Message string}
+// @Failure 400 {object} utils.Response{Success bool, Message string, Errors any}
+// @Failure 500 {object} utils.Response{Success bool, Message string, Errors any}
+// @Security Token
+// @Router /transactions/history [get]
+func GetHistoryHandler(ctx *gin.Context) {
+	userId := ctx.MustGet("userId").(string)
+	token := ctx.GetHeader("Authorization")
+
+	if token == "" {
+		ctx.JSON(http.StatusUnauthorized, utils.Response{
+			Success: false,
+			Message: "Unauthorized",
+		})
+		return
+	}
+
+	histories, err := models.GetHistory(userId)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, utils.Response{
+			Success: false,
+			Message: "Internal Server Error",
+			Errors:  err.Error(),
+		})
+		return
+	}
+
+
+	ctx.JSON(http.StatusOK, utils.Response{
+		Success: true,
+		Message: "History retrieved successfully",
+		Result: histories,
 	})
 }

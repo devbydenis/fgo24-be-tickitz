@@ -545,31 +545,6 @@ paths:
       summary: Handle upload photo
       tags:
       - profile
-  /profile/history:
-    get:
-      consumes:
-      - application/json
-      description: Get history
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/utils.Response'
-        "400":
-          description: Bad Request
-          schema:
-            $ref: '#/definitions/utils.Response'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/utils.Response'
-      security:
-      - Token: []
-      summary: Handle get history
-      tags:
-      - profile
   /transactions:
     post:
       consumes:
@@ -600,6 +575,31 @@ paths:
       summary: Handle create transaction
       tags:
       - transactions
+  /transactions/history:
+    get:
+      consumes:
+      - application/json
+      description: Get history
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/utils.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/utils.Response'
+      security:
+      - Token: []
+      summary: Handle get history
+      tags:
+      - profile
 securityDefinitions:
   Token:
     description: |-
