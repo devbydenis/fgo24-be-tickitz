@@ -39,7 +39,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           port: ${{ secrets.SSH_PORT }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          source: "./db/migrations"
+          source: "migrations"
           target: "/home/denis/deploy"
 
       - name: SSH Deploy to VPS
@@ -52,16 +52,16 @@ jobs:
           script: |
             cd /home/denis/deploy
 
-            echo "✅ Pull image from GHCR"
+            echo "----- Pull image from GHCR -----"
             docker pull ghcr.io/devbydenis/fgo24-be-tickitz:latest
 
-            echo "✅ Start DB & Redis"
+            echo "----- Start DB & Redis -----"
             docker compose up -d postgres redis
 
-            echo "⏳ Wait for Postgres"
+            echo "----- Wait for Postgres & Redis to start -----"
             sleep 10
 
-            echo "✅ Run migrations"
+            echo "----- Run migrations -----"
             docker run --rm \
               --network deploy_netapp \
               -v "/home/denis/deploy/migrations:/migrations" \
