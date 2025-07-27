@@ -52,11 +52,8 @@ jobs:
           script: |
             cd /home/denis/deploy
 
-            echo "✅ Login GHCR"
-            docker login ghcr.io -u ${{ github.actor }} --password ${{ secrets.DENIS_TOKEN }}
-
-            echo "✅ Pull latest images"
-            docker compose pull
+            echo "✅ Pull image from GHCR"
+            docker pull ghcr.io/devbydenis/fgo24-be-tickitz:latest
 
             echo "✅ Start DB & Redis"
             docker compose up -d postgres redis
@@ -69,11 +66,11 @@ jobs:
               --network deploy_netapp \
               -v "/home/denis/deploy/migrations:/migrations" \
               migrate/migrate \
-              -path=/db/migrations \
+              -path=/migrations \
               -database "postgres://postgres:1@postgres:5432/cinemax?sslmode=disable" \
               up
 
             echo "✅ Start App"
-            docker compose up -d app
+            docker compose up -d --build app
 
             echo "✅ Deploy Complete"
